@@ -6,7 +6,7 @@
  * Time: 13:52
  */
 
-namespace CoolQCreator;
+namespace CoolQ;
 
 
 class CQ

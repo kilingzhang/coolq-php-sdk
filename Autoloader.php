@@ -6,19 +6,8 @@
  * Time: 15:51
  */
 
-defined('ROOT_PATH') or define('ROOT_PATH', dirname(__DIR__));
-spl_autoload_register(function($class){
-    $prefix = 'CoolQCreator\\';
-    $baseDir = ROOT_PATH . '/src/';
-    $len = strlen($prefix);
-    if (strncmp($prefix, $class, $len) !== 0) {
-        return;
-    }
-    //$relativeClass = substr($class, $len);
-    $file = $baseDir . str_replace('\\', '/', $class) . '.php';
-    if (file_exists($file)) {
-        require $file;
-    }else{
-
-    }
+spl_autoload_register(function($className){
+    $path = str_replace('\\', DIRECTORY_SEPARATOR, $className);
+    $file = __DIR__.DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.$path.'.php';
+    if(is_file($file)) require $file;
 });

@@ -6,7 +6,7 @@
  * Time: 13:55
  */
 
-namespace CoolQCreator;
+namespace CoolQ;
 
 
 class MsgTool
