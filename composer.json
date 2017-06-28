@@ -17,8 +17,7 @@
 	},
 	"autoload": {
          "psr-4": {
-            "gangbo\\foo\\": "src/",
-            "gangbo\\foo\\test\\": "test/"
+            
          }
     }
 }
