@@ -12,12 +12,21 @@ CoolQ机器人 基于[http插件](https://richardchien.github.io/coolq-http-api/
   MsgTool.php   对特殊消息的转译等处理操作封装
   
 ```
+```
 
+    composer require slight-sky/coolq-sdk-php
 
 ```
-    include 'CoolQ.php';
-    $CoolQ = new CoolQ('127.0.0.1',5700,'token');
-    $CoolQ->getLoginInfo();
+
+```
+    require_once '../Autoloader.php';
+    
+    use CoolQ\CoolQ;
+    
+    $CoolQ = new  CoolQ('127.0.0.1',5700,'token');
+    
+    echo $CoolQ->getLoginInfo();
+    
 ```
 
 
