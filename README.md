@@ -1,4 +1,8 @@
 # coolq-sdk-php
+
+CoolQ机器人 基于[http插件](https://richardchien.github.io/coolq-http-api/#/) 
+
+
 ```
   
   CoolQ.php     sdk
