@@ -16,6 +16,12 @@ class CoolQ
     private $token;
     private $path;
 
+    /**
+     * CoolQ constructor.
+     * @param string $HOST  CoolQ插件开启的服务器地址
+     * @param int $POST     端口
+     * @param string $TOKEN token
+     */
     function __construct($HOST = '127.0.0.1', $POST = 5700, $TOKEN = '')
     {
         $this->token = $TOKEN;
@@ -395,5 +401,3 @@ class CoolQ
 
 }
 
-$CoolQ = new CoolQ('127.0.0.1', '5700', $TOKEN = 'slight');
-echo $CoolQ->getLoginInfo(1353693508, 1353693508);

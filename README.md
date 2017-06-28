@@ -1,2 +1,2 @@
 # coolq-sdk-php
-[API 描述](https://richardchien.github.io/coolq-http-api/#/API)
+[API参数描述](https://richardchien.github.io/coolq-http-api/#/API)
