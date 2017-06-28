@@ -15,6 +15,15 @@ CoolQ机器人 基于[http插件](https://richardchien.github.io/coolq-http-api/
 ```
 
     composer require slight-sky/coolq-sdk-php
+    
+    {
+        "require": {
+    		"slight-sky/coolq-sdk-php": "^0.1.0"
+        }
+    }
+
+    
+    
 
 ```
 
