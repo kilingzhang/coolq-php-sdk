@@ -6,7 +6,7 @@
  * Time: 12:57
  */
 
-namespace CoolQ;
+namespace CoolQCreator;
 
 
 class CoolQ
@@ -18,8 +18,8 @@ class CoolQ
 
     /**
      * CoolQ constructor.
-     * @param string $HOST  CoolQ插件开启的服务器地址
-     * @param int $POST     端口
+     * @param string $HOST CoolQ插件开启的服务器地址
+     * @param int $POST 端口
      * @param string $TOKEN token
      */
     function __construct($HOST = '127.0.0.1', $POST = 5700, $TOKEN = '')
@@ -316,7 +316,7 @@ class CoolQ
      * /get_group_member_list 获取群成员列表
      *   参数
      *        字段名    数据类型    默认值    说明
-     * @param $group_id number	-	群号
+     * @param $group_id number    -    群号
      * @return mixed|string
      */
     public function getGroupMemberList($group_id)
@@ -331,9 +331,9 @@ class CoolQ
      * /get_group_member_info 获取群成员信息
      *   参数
      *        字段名    数据类型    默认值    说明
-     * @param $group_id number	-	群号
-     * @param $user_id  number	-	QQ 号（不可以是登录号）
-     * @param string $no_cache  bool	false	是否不使用缓存（使用缓存可能更新不及时，但响应更快）
+     * @param $group_id number    -    群号
+     * @param $user_id  number    -    QQ 号（不可以是登录号）
+     * @param string $no_cache bool    false    是否不使用缓存（使用缓存可能更新不及时，但响应更快）
      * @return mixed|string
      */
     public function getGroupMemberInfo($group_id, $user_id, $no_cache = 'false')
@@ -348,8 +348,8 @@ class CoolQ
      * /get_stranger_info 获取陌生人信息
      *   参数
      *        字段名    数据类型    默认值    说明
-     * @param $user_id  number	-	QQ 号（不可以是登录号）
-     * @param string $no_cache  bool	false	是否不使用缓存（使用缓存可能更新不及时，但响应更快）
+     * @param $user_id  number    -    QQ 号（不可以是登录号）
+     * @param string $no_cache bool    false    是否不使用缓存（使用缓存可能更新不及时，但响应更快）
      * @return mixed|string
      */
     public function getStrangerInfo($user_id, $no_cache = 'false')
@@ -397,6 +397,11 @@ class CoolQ
         }
         curl_close($curl);
         return $data;
+    }
+
+    public static function Test()
+    {
+        return 'success';
     }
 
 }
