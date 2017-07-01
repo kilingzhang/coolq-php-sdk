@@ -17,7 +17,7 @@ class CoolQ
     private $path;
 
     /**
-     * CoolQ constructor.
+     * CoolQSDK constructor.
      * @param string $HOST CoolQ插件开启的服务器地址
      * @param int $POST 端口
      * @param string $TOKEN token
