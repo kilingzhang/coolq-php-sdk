@@ -18,7 +18,7 @@ CoolQ机器人 基于[http插件](https://richardchien.github.io/coolq-http-api/
     
     {
         "require": {
-    		"slight-sky/coolq-sdk-php": "^0.2.0"
+    		"slight-sky/coolq-sdk-php": "^0.3.0"
         }
     }
 
@@ -30,9 +30,9 @@ CoolQ机器人 基于[http插件](https://richardchien.github.io/coolq-http-api/
 ```
     require_once '../Autoloader.php';
     
-    use CoolQSDK\CoolQ;
+    use CoolQSDK\CoolQSDK;
     
-    $CoolQ = new  CoolQ('127.0.0.1',5700,'token');
+    $CoolQ = new  CoolQSDK('127.0.0.1',5700,'token');
     
     echo $CoolQ->getLoginInfo();
     
