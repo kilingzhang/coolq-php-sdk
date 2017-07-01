@@ -30,7 +30,7 @@ CoolQ机器人 基于[http插件](https://richardchien.github.io/coolq-http-api/
 ```
     require_once '../Autoloader.php';
     
-    use CoolQ\CoolQ;
+    use CoolQSDK\CoolQ;
     
     $CoolQ = new  CoolQ('127.0.0.1',5700,'token');
     

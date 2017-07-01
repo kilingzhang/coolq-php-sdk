@@ -8,7 +8,7 @@
 
 require_once '../Autoloader.php';
 
-use CoolQ\CoolQ;
+use CoolQSDK\CoolQ;
 
 $CoolQ = new  CoolQ('127.0.0.1',5700,'slight');
 echo $CoolQ->getLoginInfo();

@@ -6,7 +6,7 @@
  * Time: 12:57
  */
 
-namespace CoolQ;
+namespace CoolQSDK;
 
 
 class CoolQ
