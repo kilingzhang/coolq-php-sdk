@@ -38,5 +38,9 @@ CoolQ机器人 基于[http插件](https://richardchien.github.io/coolq-http-api/
     
 ```
 
+#log
+
+- 添加获取群列表
+
 
 [API参数描述](https://richardchien.github.io/coolq-http-api/#/API)

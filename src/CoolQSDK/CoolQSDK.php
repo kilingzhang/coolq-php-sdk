@@ -313,6 +313,19 @@ class CoolQSDK
     }
 
     /**
+     * /get_group_list  获取群列表
+     *   参数
+     *        字段名    数据类型    默认值    说明
+     * @return mixed|string
+     */
+    public function getGroupList()
+    {
+        $url = $this->path . "get_group_list";
+        $res = self::curl_request($url);
+        return $res;
+    }
+
+    /**
      * /get_group_member_list 获取群成员列表
      *   参数
      *        字段名    数据类型    默认值    说明
