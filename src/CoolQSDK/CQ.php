@@ -85,4 +85,17 @@ class CQ
         return "[CQ:share,url=$url,title=$title,content=$content,image=$image] ";
     }
 
+    public static function filterCQAt($string)
+    {
+        return preg_replace('/\[CQ:at,qq=\d+\]/','',$string);
+    }
+
+    public static function deCodeHtml($message)
+    {
+        $message = preg_replace("/&amp;/", "&", $message);
+        $message = preg_replace("/&#91;/", "[", $message);
+        $message = preg_replace("/&#93;/", "]", $message);
+        return $message;
+    }
+
 }

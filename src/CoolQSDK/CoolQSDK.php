@@ -65,11 +65,19 @@ class CoolQSDK
      * @param string $is_raw bool    false    消息内容是否作为纯文本发送（即不解析 CQ 码），message 数据类型为 array 时无效
      * @return mixed|string
      */
-    public function sendPrivateMsg($user_id, $message, $is_raw = 'false')
+    public function sendPrivateMsg($user_id, $message, $is_raw = false, $is_post = false)
     {
-        $message = urlencode($message);
-        $url = $this->path . "send_private_msg?user_id=$user_id&message=$message&is_raw=$is_raw";
-        $res = self::curl_request($url);
+        if($is_post == false){
+            $message = urlencode($message);
+            $url = $this->path . "send_private_msg?user_id=$user_id&message=$message&is_raw=$is_raw";
+            $res = self::curl_request($url);
+        }else{
+            $url = $this->path . "send_private_msg";
+            $data['user_id'] = $user_id;
+            $data['message'] = $message;
+            $data = json_encode($data,JSON_UNESCAPED_UNICODE);
+            $res = self::curl_post($url,$data);
+        }
         return $res;
     }
 
@@ -82,11 +90,19 @@ class CoolQSDK
      * @param string $is_raw bool    false    消息内容是否作为纯文本发送（即不解析 CQ 码），message 数据类型为 array 时无效
      * @return mixed|string
      */
-    public function sendGroupMsg($group_id, $message, $is_raw = 'false')
+    public function sendGroupMsg($group_id, $message, $is_raw = false, $is_post = false)
     {
-        $message = urlencode($message);
-        $url = $this->path . "send_group_msg?group_id=$group_id&message=$message&is_raw=$is_raw";
-        $res = self::curl_request($url);
+        if($is_post == false){
+            $message = urlencode($message);
+            $url = $this->path . "send_group_msg?group_id=$group_id&message=$message&is_raw=$is_raw";
+            $res = self::curl_request($url);
+        }else{
+            $url = $this->path . "send_group_msg";
+            $data['group_id'] = $group_id;
+            $data['message'] = $message;
+            $data = json_encode($data,JSON_UNESCAPED_UNICODE);
+            $res = self::curl_post($url,$data);
+        }
         return $res;
     }
 
@@ -99,11 +115,19 @@ class CoolQSDK
      * @param string $is_raw bool    false    消息内容是否作为纯文本发送（即不解析 CQ 码），message 数据类型为 array 时无效
      * @return mixed|string
      */
-    public function sendDiscussMsg($discuss_id, $message, $is_raw = 'false')
+    public function sendDiscussMsg($discuss_id, $message, $is_raw = false, $is_post = false)
     {
-        $message = urlencode($message);
-        $url = $this->path . "send_discuss_msg?discuss_id=$discuss_id&message=$message&is_raw=$is_raw";
-        $res = self::curl_request($url);
+        if($is_post == false){
+            $message = urlencode($message);
+            $url = $this->path . "send_discuss_msg?discuss_id=$discuss_id&message=$message&is_raw=$is_raw";
+            $res = self::curl_request($url);
+        }else{
+            $url = $this->path . "send_discuss_msg";
+            $data['discuss_id'] = $discuss_id;
+            $data['message'] = $message;
+            $data = json_encode($data,JSON_UNESCAPED_UNICODE);
+            $res = self::curl_post($url,$data);
+        }
         return $res;
     }
 
@@ -131,7 +155,7 @@ class CoolQSDK
      * @param string $reject_add_request bool    false    拒绝此人的加群请求
      * @return mixed|string
      */
-    public function setGroupKick($group_id, $user_id, $reject_add_request = 'false')
+    public function setGroupKick($group_id, $user_id, $reject_add_request = false)
     {
         $url = $this->path . "set_group_kick?group_id=$group_id&user_id=$user_id&reject_add_request=$reject_add_request";
         $res = self::curl_request($url);
@@ -163,7 +187,7 @@ class CoolQSDK
      * @param string $enable bool    true    是否禁言
      * @return mixed|string
      */
-    public function setGroupWholeBan($group_id, $enable = 'true')
+    public function setGroupWholeBan($group_id, $enable = true)
     {
         $url = $this->path . "set_group_whole_ban?group_id=$group_id&enable=$enable";
         $res = self::curl_request($url);
@@ -195,7 +219,7 @@ class CoolQSDK
      * @param string $enable bool    true    true 为设置，false 为取消
      * @return mixed|string
      */
-    public function setGroupAdmin($group_id, $user_id, $enable = 'true')
+    public function setGroupAdmin($group_id, $user_id, $enable = true)
     {
         $url = $this->path . "set_group_admin?group_id=$group_id&user_id=$user_id&enable=$enable";
         $res = self::curl_request($url);
@@ -210,7 +234,7 @@ class CoolQSDK
      * @param string $enable bool    true    是否允许匿名聊天
      * @return mixed|string
      */
-    public function setGroupAnonymous($group_id, $enable = 'true')
+    public function setGroupAnonymous($group_id, $enable = true)
     {
         $url = $this->path . "set_group_anonymous?group_id=$group_id&enable=$enable";
         $res = self::curl_request($url);
@@ -258,7 +282,7 @@ class CoolQSDK
      * @param string $is_dismiss bool    false    是否解散，如果登录号是群主，则仅在此项为 true 时能够解散
      * @return mixed|string
      */
-    public function setGroupLeave($group_id, $is_dismiss = 'false')
+    public function setGroupLeave($group_id, $is_dismiss = false)
     {
         $url = $this->path . "set_group_leave?group_id=$group_id&is_dismiss=$is_dismiss";
         $res = self::curl_request($url);
@@ -288,7 +312,7 @@ class CoolQSDK
      * @param string $remark string    空    添加后的好友备注（仅在同意时有效）
      * @return mixed|string
      */
-    public function setFriendAddRequest($flag, $approve = 'true', $remark = "")
+    public function setFriendAddRequest($flag, $approve = true, $remark = "")
     {
         $url = $this->path . "set_friend_add_request?flag=$flag&approve=$approve&remark=$remark";
         $res = self::curl_request($url);
@@ -305,7 +329,7 @@ class CoolQSDK
      * @param string $reason string    空    拒绝理由（仅在拒绝时有效）
      * @return mixed|string
      */
-    public function setGroupAddRequest($flag, $type, $approve = 'true', $reason = "")
+    public function setGroupAddRequest($flag, $type, $approve = true, $reason = "")
     {
         $url = $this->path . "set_group_add_request?flag=$flag&type=$type&approve=$approve&remark=$reason";
         $res = self::curl_request($url);
@@ -349,7 +373,7 @@ class CoolQSDK
      * @param string $no_cache bool    false    是否不使用缓存（使用缓存可能更新不及时，但响应更快）
      * @return mixed|string
      */
-    public function getGroupMemberInfo($group_id, $user_id, $no_cache = 'false')
+    public function getGroupMemberInfo($group_id, $user_id, $no_cache = false)
     {
         $url = $this->path . "get_group_member_info?group_id=$group_id&user_id=$user_id&no_cache=$no_cache";
         $res = self::curl_request($url);
@@ -365,7 +389,7 @@ class CoolQSDK
      * @param string $no_cache bool    false    是否不使用缓存（使用缓存可能更新不及时，但响应更快）
      * @return mixed|string
      */
-    public function getStrangerInfo($user_id, $no_cache = 'false')
+    public function getStrangerInfo($user_id, $no_cache = false)
     {
         $url = $this->path . "get_stranger_info?user_id=$user_id&no_cache=$no_cache";
         $res = self::curl_request($url);
@@ -409,6 +433,20 @@ class CoolQSDK
             return curl_error($curl);
         }
         curl_close($curl);
+        return $data;
+    }
+
+    public function curl_post($url,$data)
+    {
+        $header[] = "Authorization:token $this->token";
+        $header[] = "Content-Type: application/json";
+        $header[] = "Content-Length: ". strlen($data);
+        $ch = curl_init($url); //请求的URL地址
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);//$data JSON类型字符串
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $data = curl_exec($ch);
         return $data;
     }
 
