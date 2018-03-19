@@ -6,11 +6,11 @@
  * Time: 15:53
  */
 
-require_once '../Autoloader.php';
+include __DIR__.'/../vendor/autoload.php';
 
-use CoolQSDK\CoolQSDK;
+use CoolQSDK\CoolQ;
 
-$CoolQ = new  CoolQSDK('127.0.0.1',5700,'slight');
+$CoolQ = new  CoolQ('127.0.0.1',5700);
 
 //unset($message);
 //$message[0]['type'] = 'text';
@@ -18,4 +18,4 @@ $CoolQ = new  CoolQSDK('127.0.0.1',5700,'slight');
 //    'text'=>'1231145646'
 //);
 //
-//echo $CoolQ->sendGroupMsg(194233857,$message,false,true);
+echo $CoolQ->getGroupList();

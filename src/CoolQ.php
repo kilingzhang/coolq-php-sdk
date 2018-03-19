@@ -9,7 +9,7 @@
 namespace CoolQSDK;
 
 
-class CoolQSDK
+class CoolQ
 {
     private $host;
     private $post;
