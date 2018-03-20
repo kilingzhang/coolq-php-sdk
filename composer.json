@@ -1,4 +1,3 @@
-
 {
     "name": "kilingzhang/coolq-php-sdk",
     "description": "coolq-php-sdk",
@@ -19,8 +18,9 @@
         }
     ],
     "require:": {
-        "php": ">=5.3",
-        "guzzlehttp/guzzle": "^6.2"
+        "php": ">=5.5",
+        "guzzlehttp/guzzle": "^6.0",
+        "psr/log": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "~6.0",
@@ -35,5 +35,9 @@
         "psr-4": {
             "CoolQSDK\\Tests\\": "tests/"
         }
+    },
+    "require": {
+        "guzzlehttp/guzzle": "~6.0",
+        "psr/log": "^1.0"
     }
 }
