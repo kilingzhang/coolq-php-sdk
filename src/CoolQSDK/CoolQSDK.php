@@ -62,17 +62,17 @@ class CoolQSDK
      *        字段名    数据类型    默认值    说明
      * @param $user_id  number    -    对方 QQ 号
      * @param $message  string/array    -    要发送的内容
-     * @param string $is_raw bool    false    消息内容是否作为纯文本发送（即不解析 CQ 码），message 数据类型为 array 时无效
+     * @param string $auto_escape bool    false    消息内容是否作为纯文本发送（即不解析 CQ 码），message 数据类型为 array 时无效
      * @return mixed|string
      */
-    public function sendPrivateMsg($user_id, $message, $is_raw = false, $is_post = false)
+    public function sendPrivateMsg($user_id, $message, $auto_escape = false, $is_post = false)
     {
         if($is_post == false){
             $message = urlencode($message);
-            $url = $this->path . "send_private_msg?user_id=$user_id&message=$message&is_raw=$is_raw";
+            $url = $this->path . "send_private_msg_async?user_id=$user_id&message=$message&auto_escape=$auto_escape";
             $res = self::curl_request($url);
         }else{
-            $url = $this->path . "send_private_msg";
+            $url = $this->path . "send_private_msg_async";
             $data['user_id'] = $user_id;
             $data['message'] = $message;
             $data = json_encode($data,JSON_UNESCAPED_UNICODE);
@@ -87,17 +87,17 @@ class CoolQSDK
      *        字段名    数据类型    默认值    说明
      * @param $group_id number    -    群号
      * @param $message  string/array    -    要发送的内容
-     * @param string $is_raw bool    false    消息内容是否作为纯文本发送（即不解析 CQ 码），message 数据类型为 array 时无效
+     * @param string $auto_escape bool    false    消息内容是否作为纯文本发送（即不解析 CQ 码），message 数据类型为 array 时无效
      * @return mixed|string
      */
-    public function sendGroupMsg($group_id, $message, $is_raw = false, $is_post = false)
+    public function sendGroupMsg($group_id, $message, $auto_escape = false, $is_post = false)
     {
         if($is_post == false){
             $message = urlencode($message);
-            $url = $this->path . "send_group_msg?group_id=$group_id&message=$message&is_raw=$is_raw";
+            $url = $this->path . "send_group_msg_async?group_id=$group_id&message=$message&auto_escape=$auto_escape";
             $res = self::curl_request($url);
         }else{
-            $url = $this->path . "send_group_msg";
+            $url = $this->path . "send_group_msg_async";
             $data['group_id'] = $group_id;
             $data['message'] = $message;
             $data = json_encode($data,JSON_UNESCAPED_UNICODE);
@@ -112,17 +112,17 @@ class CoolQSDK
      *        字段名    数据类型    默认值    说明
      * @param $discuss_id   number    -    讨论组 ID（正常情况下看不到，需要从讨论组消息上报的数据中获得）
      * @param $message  string/array    -    要发送的内容
-     * @param string $is_raw bool    false    消息内容是否作为纯文本发送（即不解析 CQ 码），message 数据类型为 array 时无效
+     * @param string $auto_escape bool    false    消息内容是否作为纯文本发送（即不解析 CQ 码），message 数据类型为 array 时无效
      * @return mixed|string
      */
-    public function sendDiscussMsg($discuss_id, $message, $is_raw = false, $is_post = false)
+    public function sendDiscussMsg($discuss_id, $message, $auto_escape = false, $is_post = false)
     {
         if($is_post == false){
             $message = urlencode($message);
-            $url = $this->path . "send_discuss_msg?discuss_id=$discuss_id&message=$message&is_raw=$is_raw";
+            $url = $this->path . "send_discuss_ms_asyncg?discuss_id=$discuss_id&message=$message&auto_escape=$auto_escape";
             $res = self::curl_request($url);
         }else{
-            $url = $this->path . "send_discuss_msg";
+            $url = $this->path . "send_discuss_msg_async";
             $data['discuss_id'] = $discuss_id;
             $data['message'] = $message;
             $data = json_encode($data,JSON_UNESCAPED_UNICODE);
