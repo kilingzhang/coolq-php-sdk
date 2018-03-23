@@ -69,8 +69,8 @@ echo $CoolQ->getLoginInfo();
 
 ## 框架支持 (未来计划)
 
-- ~~ [Laravel](https://github.com/kilingzhang/coolq-laravel-sdk) ~~
-- ~~ [Lumen](https://github.com/kilingzhang/coolq-lumen-sdk) ~~
+- ~~[Laravel](https://github.com/kilingzhang/coolq-laravel-sdk)~~
+- ~~[Lumen](https://github.com/kilingzhang/coolq-lumen-sdk)~~
 
 ## 更新记录
 
