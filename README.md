@@ -64,6 +64,7 @@ echo $CoolQ->getLoginInfo();
 3. 删除``` $is_post ```参数　(5.0以下版本用于选择请求接口方法为```GET```还是```POST```，默认```GET```)　现在默认统一为```GET```
 4. sendXXX函数添加```$is_aysnc```字段，字段默认为false
 5. ```$auto_escape```字段已做向下兼容
+6. 0.5.x版本用户可继续通过```composer require slight-sky/coolq-sdk-php```安装
 
 
 ##　框架支持 (未来计划)
