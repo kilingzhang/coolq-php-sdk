@@ -52,10 +52,10 @@ echo $CoolQ->getLoginInfo();
 
 ## 文档
 
-###　API 调用
+### API 调用
 ~~暂未更新~~
 
-###　事件处理
+### 事件处理
 ~~暂未更新~~
 
 ## 版本升级(针对0.5升级至1.x)
@@ -67,17 +67,17 @@ echo $CoolQ->getLoginInfo();
 6. 0.5.x版本用户可继续通过```composer require slight-sky/coolq-sdk-php```安装
 
 
-##　框架支持 (未来计划)
+## 框架支持 (未来计划)
 
-### ~~ [Laravel](https://github.com/kilingzhang/coolq-laravel-sdk) ~~
-### ~~ [Lumen](https://github.com/kilingzhang/coolq-lumen-sdk) ~~
+- ~~ [Laravel](https://github.com/kilingzhang/coolq-laravel-sdk) ~~
+- ~~ [Lumen](https://github.com/kilingzhang/coolq-lumen-sdk) ~~
 
-##　更新记录
+## 更新记录
 
 - 添加获取群列表
 - 添加POST提交事件方式
 - 升级SDK 同步cqhttp3.x版本插件
 - 兼容cqhttp2.x版本
 
-##　API参数描述 
+## API参数描述 
 [API参数描述](https://cqhttp.cc/docs/)
