@@ -1,7 +1,4 @@
 /vendor/
 .idea
-<<<<<<< HEAD
-=======
 composer.lock
 Resopnse.md
->>>>>>> cqhttp3.0
