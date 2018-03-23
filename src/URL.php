@@ -12,9 +12,13 @@ namespace CoolQSDK;
 class URL
 {
     const send_private_msg = '/send_private_msg';
+    const send_private_msg_async = '/send_private_msg_async';
     const send_group_msg = '/send_group_msg';
+    const send_group_msg_async = '/send_group_msg_async';
     const send_discuss_msg = '/send_discuss_msg';
+    const send_discuss_msg_async = '/send_discuss_msg_async';
     const send_msg = '/send_msg';
+    const send_msg_async = '/send_msg_async';
     const delete_msg = '/delete_msg';
     const send_like = '/send_like';
     const set_group_kick = '/set_group_kick';

@@ -14,7 +14,8 @@ use CoolQSDK\Response;
 include __DIR__ . '/../vendor/autoload.php';
 
 
-$CoolQ = new  CoolQ('127.0.0.1:5700', '', '');
+$CoolQ = new  CoolQ('127.0.0.1:5700', 'kilingzhang', 'kilingzhang');
+//$CoolQ->setReturnFormat('array');
 //194233857
 //1353693508
-echo $CoolQ->get_cookies(194233857, 1353693508);
+echo $CoolQ->sendPrivateMsg(1353693508, 194233857, false, true);

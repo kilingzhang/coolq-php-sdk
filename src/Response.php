@@ -13,12 +13,30 @@ class Response
 {
     public static function Respose($data = [], $code = 0, $message = 'success', $status = 'ok')
     {
-        return \GuzzleHttp\json_encode([
-            'retcode' => $code,
-            'status' => $status,
-            'message' => $message,
-            'data' => $data
-        ], JSON_UNESCAPED_UNICODE);
+        $respose = null;
+        switch (CoolQ::$return_format) {
+            case "string":
+                $respose = \GuzzleHttp\json_encode([
+                    'retcode' => $code,
+                    'status' => $status,
+                    'message' => $message,
+                    'data' => $data
+                ], JSON_UNESCAPED_UNICODE);
+                break;
+            case "array":
+                $respose = [
+                    'retcode' => $code,
+                    'status' => $status,
+                    'message' => $message,
+                    'data' => $data
+                ];
+                break;
+            default:
+                $respose = 'Not Found Format';
+                break;
+        }
+        return $respose;
+
     }
 
     public static function Ok($response)
