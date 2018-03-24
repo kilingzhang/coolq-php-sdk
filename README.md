@@ -12,7 +12,7 @@ composer require kilingzhang/coolq-php-sdk
 #### 或在 ```composer.json``` ```require``` 字段下添加    
 ```
 
-"require:": {
+"require": {
         ... ,
         "kilingzhang/coolq-php-sdk": "^1.0"
     },
