@@ -68,7 +68,7 @@ class Response
         return self::Respose([], 406, self::getMessage(406), 'failed');
     }
 
-    public static function PulginServerError()
+    public static function PluginServerError()
     {
         return self::Respose([], -2333, self::getMessage(-2333), 'failed');
     }
