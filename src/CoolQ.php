@@ -718,7 +718,7 @@ class CoolQ
             //一般为coolq-http-api插件未开启 接口地址无法访问
             switch ($e->getCode()) {
                 case 0:
-                    return Response::PulginServerError();
+                    return Response::PluginServerError();
                     break;
                 default:
                     return Response::Error([
