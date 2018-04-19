@@ -61,7 +61,7 @@ echo $CoolQ->getLoginInfo();
 ## 版本升级(针对0.5升级至1.x)
 1. 命名空间更改由```CoolQSDK\CoolQSDK```更换为```CoolQSDK\CoolQ```
 2. ```new CoolQSDK('127.0.0.1',5700,'token')```  更改为  ```new CoolQ('127.0.0.1:5700', 'your-access_token', 'your-secret')``` 新版本已做 ```token``` 与　```access_token```兼容
-3. 删除``` $is_post ```参数　(5.0以下版本用于选择请求接口方法为```GET```还是```POST```，默认```GET```)　现在默认统一为```GET```
+3. 删除``` $is_post ```参数　(0.5以下版本用于选择请求接口方法为```GET```还是```POST```，默认```GET```)　现在默认统一为```GET```
 4. sendXXX函数添加```$is_aysnc```字段，字段默认为false
 5. ```$auto_escape```字段已做向下兼容
 6. 0.5.x版本用户可继续通过```composer require slight-sky/coolq-sdk-php```安装
