@@ -28,24 +28,272 @@
 
 namespace CoolQSDK;
 
+use CoolQSDK\Plugin\BasePlugin;
+use CoolQSDK\Plugin\TulingPlugin;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Exception\ServerException;
-use GuzzleHttp\Exception\TransferException;
+
 
 class CoolQ
 {
     private $host;
     private $token;
     private $secret = '';
-    private $is_signature = true;
-    private $is_async = false;
+    private $isSignature = true;
+    private $isAsync = false;
     private static $client;
     private static $options;
-    public static $return_format = 'string';
+    private $block = false;
+
+    private static $returnFormat = 'string';
+
+    private $content = array();
+    private $postType;
+    private $plugins = array();
+
+
+
+
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+    public function attach(BasePlugin $plugin)
+    {
+        $key = array_search($plugin, $this->plugins);
+        if ($key === false) {
+            $this->plugins[] = $plugin;
+        }
+    }
+
+    public function detach(BasePlugin $plugin)
+    {
+        $key = array_search($plugin, $this->plugins);
+        if ($key !== false) {
+            unset($this->plugins[$key]);
+        }
+    }
+
+    public function notify()
+    {
+        // TODO: Implement notify() method.
+        foreach ($this->plugins as $plugin) {
+            // 把本类对象传给观察者，以便观察者获取当前类对象的信息
+            if (!$this->block) {
+                switch ($this->postType) {
+                    //收到消息
+                    case 'message':
+                        $plugin->message($this);
+                        break;
+                    //群、讨论组变动等非消息类事件
+                    case 'event':
+                        $plugin->event($this);
+                        break;
+                    //加好友请求、加群请求／邀请
+                    case 'request':
+                        $plugin->request($this);
+                        break;
+                    default:
+                        $plugin->other($this);
+                        break;
+                }
+            }
+        }
+        $this->block = false;
+    }
+
+
+    public function event()
+    {
+
+        $signature = self::server('HTTP_X_SIGNATURE');
+        $signature = $signature['HTTP_X_SIGNATURE'] ? substr($signature['HTTP_X_SIGNATURE'], 5, strlen($signature['HTTP_X_SIGNATURE'])) : "";
+        $content = self::put();
+        if ($this->isSignature && !empty($signature) && (hash_hmac('sha1', \GuzzleHttp\json_encode($content, JSON_UNESCAPED_UNICODE), $this->secret) != $signature)) {
+            //TODO sha1验证失败
+            echo '{"block": true,"reply":"signature=false"}';
+            return;
+        }
+
+        $this->postType = $content['post_type'];
+        switch ($this->postType) {
+            //收到消息
+            case 'message':
+                $message_type = $content['message_type'];
+                switch ($message_type) {
+                    //私聊消息
+                    case "private":
+
+                        $this->content = [
+                            'message_type' => $content['message_type'],
+                            'message_id' => $content['message_id'],
+                            'font' => $content['font'],
+                            'user_id' => $content['user_id'],
+                            'message' => $content['message'],
+                            //消息子类型，如果是好友则是 "friend"，
+                            //如果从群或讨论组来的临时会话则分别是 "group"、"discuss"
+                            //"friend"、"group"、"discuss"、"other"
+                            'sub_type' => $content['sub_type'],
+                        ];
+
+                        break;
+                    //群消息
+                    case "group":
+
+                        $this->content = [
+                            'message_type' => $content['message_type'],
+                            'message_id' => $content['message_id'],
+                            'font' => $content['font'],
+                            'user_id' => $content['user_id'],
+                            'message' => $content['message'],
+                            'group_id' => $content['group_id'],
+                            //匿名用户显示名
+                            'anonymous' => $content['anonymous'],
+                            //匿名用户 flag，在调用禁言 API 时需要传入
+                            'anonymous_flag' => $content['anonymous_flag'],
+                        ];
+
+                        // {"reply":"message","block": true,"at_sender":true,"kick":false,"ban":false}
+
+
+                        break;
+                    //讨论组消息
+                    case "discuss":
+
+                        $this->content = [
+                            'message_type' => $content['message_type'],
+                            'message_id' => $content['message_id'],
+                            'font' => $content['font'],
+                            'discuss_id' => $content['discuss_id'],
+                            'user_id' => $content['user_id'],
+                            'message' => $content['message'],
+                        ];
+
+                        // {"reply":"message","block": true,"at_sender":true}
+                        //todo
+                        //以后再说吧
+                        break;
+                }
+                break;
+            //群、讨论组变动等非消息类事件
+            case 'event':
+                $event = $content['event'];
+                switch ($event) {
+                    //群管理员变动
+                    case "group_admin":
+
+                        $this->content = [
+                            'event' => $content['event'],
+                            //"set"、"unset"	事件子类型，分别表示设置和取消管理员
+                            'sub_type' => $content['sub_type'],
+                            'group_id' => $content['group_id'],
+                            'user_id' => $content['user_id'],
+                        ];
+
+                        break;
+                    //群成员减少
+                    case "group_decrease":
+
+                        $this->content = [
+                            'event' => $content['event'],
+                            //"leave"、"kick"、"kick_me"	事件子类型，分别表示主动退群、成员被踢、登录号被踢
+                            'sub_type' => $content['sub_type'],
+                            'group_id' => $content['group_id'],
+                            'user_id' => $content['user_id'],
+                            'operator_id' => $content['operator_id'],
+                        ];
+
+                        break;
+                    //群成员增加
+                    case "group_increase":
+
+                        $this->content = [
+                            'event' => $content['event'],
+                            //"approve"、"invite"	事件子类型，分别表示管理员已同意入群、管理员邀请入群
+                            'sub_type' => $content['sub_type'],
+                            'group_id' => $content['group_id'],
+                            'user_id' => $content['user_id'],
+                            'operator_id' => $content['operator_id'],
+                        ];
+
+
+                        break;
+                    //群文件上传
+                    case "group_upload":
+
+
+                        $this->content = [
+                            'event' => $content['event'],
+                            'group_id' => $content['group_id'],
+                            'user_id' => $content['user_id'],
+                            #字段名	数据类型	说明
+                            #id	string	文件 ID
+                            #name	string	文件名
+                            #size	number	文件大小（字节数）
+                            #busid	number	busid（目前不清楚有什么作用）
+                            'file' => $content['file'],
+                        ];
+
+                        break;
+                    //好友添加
+                    case "friend_added":
+
+                        $this->content = [
+                            'event' => $content['event'],
+                            'user_id' => $content['user_id'],
+                        ];
+
+                        break;
+                }
+                break;
+            //加好友请求、加群请求／邀请
+            case 'request':
+                $request_type = $content['request_type'];
+                switch ($request_type) {
+                    case "friend":
+
+                        $this->content = [
+                            'request_type' => $content['request_type'],
+                            'user_id' => $content['user_id'],
+                            'message' => $content['message'],
+                            'flag' => $content['flag'],
+                        ];
+
+                        //{"block": true,"approve":true,"reason":"就是拒绝你 不行啊"}
+                        break;
+                    case "group":
+
+                        $this->content = [
+                            'request_type' => $content['request_type'],
+                            //"add"、"invite"	请求子类型，分别表示加群请求、邀请登录号入群
+                            'sub_type' => $content['sub_type'],
+                            'group_id' => $content['group_id'],
+                            'user_id' => $content['user_id'],
+                            'message' => $content['message'],
+                            'flag' => $content['flag'],
+                        ];
+
+                        //{"block": true,"approve":true,"reason":"就是拒绝你 不行啊"}
+                        break;
+                }
+                break;
+            default:
+
+                $this->content = $content;
+
+                break;
+        }
+
+        $this->notify();
+
+    }
+
+    private function initAttach()
+    {
+        $this->attach(new TulingPlugin());
+    }
 
     public function __construct($host = '127.0.0.1:5700', $token = '', $secret = '')
     {
@@ -63,6 +311,9 @@ class CoolQ
             // You can set any number of default request options.
             'timeout' => 10.0,
         ]);
+
+        $this->initAttach();
+
     }
 
     /**
@@ -102,15 +353,15 @@ class CoolQ
      */
     public function isSignature()
     {
-        return $this->is_signature;
+        return $this->isSignature;
     }
 
     /**
-     * @param bool $is_signature
+     * @param bool $isSignature
      */
-    public function setIsSignature($is_signature)
+    public function setIsSignature($isSignature)
     {
-        $this->is_signature = $is_signature;
+        $this->isSignature = $isSignature;
     }
 
     /**
@@ -118,42 +369,43 @@ class CoolQ
      */
     public function isAsync()
     {
-        return $this->is_async;
+        return $this->isAsync;
     }
 
     /**
-     * @param bool $is_async
+     * @param bool $isAsync
      */
-    public function setIsAsync($is_async)
+    public function setIsAsync($isAsync)
     {
-        $this->is_async = $is_async;
+        $this->isAsync = $isAsync;
     }
+
 
     /**
      * @return string
      */
-    public function getReturnFormat()
+    public static function getReturnFormat(): string
     {
-        return self::$return_format;
+        return self::$returnFormat;
     }
 
     /**
-     * @param string $return_format
+     * @param string $returnFormat
      */
-    public function setReturnFormat($return_format)
+    public static function setReturnFormat($returnFormat)
     {
         $formats = [
             'string',
             'array'
         ];
-        if (in_array($return_format, $formats)) {
-            self::$return_format = $return_format;
+        if (in_array($returnFormat, $formats)) {
+            self::$returnFormat = $returnFormat;
         }
     }
 
     public function sendPrivateMsg($user_id, $message, $auto_escape = false, $async = null)
     {
-        if ((is_null($async) && $this->is_async) || $async === true) {
+        if ((is_null($async) && $this->isAsync) || $async === true) {
             return $this->sendPrivateMsgAsync($user_id, $message, $auto_escape);
         }
 
@@ -181,7 +433,7 @@ class CoolQ
 
     public function sendGroupMsg($group_id, $message, $auto_escape = false, $async = null)
     {
-        if ((is_null($async) && $this->is_async) || $async === true) {
+        if ((is_null($async) && $this->isAsync) || $async === true) {
             return $this->sendGroupMsgAsync($group_id, $message, $auto_escape);
         }
 
@@ -209,7 +461,7 @@ class CoolQ
 
     public function sendDiscussMsg($discuss_id, $message, $auto_escape = false, $async = null)
     {
-        if ((is_null($async) && $this->is_async) || $async === true) {
+        if ((is_null($async) && $this->isAsync) || $async === true) {
             return $this->sendDiscussMsgAsync($discuss_id, $message, $auto_escape);
         }
 
@@ -237,7 +489,7 @@ class CoolQ
 
     public function sendMsg($message_type, $id, $message, $auto_escape = false, $async = null)
     {
-        if ((is_null($async) && $this->is_async) || $async === true) {
+        if ((is_null($async) && $this->isAsync) || $async === true) {
             return $this->sendMsgAsync($message_type, $id, $message, $auto_escape);
         }
 
@@ -538,123 +790,6 @@ class CoolQ
         return $this->CURL($uri, $param);
     }
 
-    public function event()
-    {
-        $signature = self::server('HTTP_X_SIGNATURE');
-        $signature = $signature['HTTP_X_SIGNATURE'] ? substr($signature['HTTP_X_SIGNATURE'], 5, strlen($signature['HTTP_X_SIGNATURE'])) : "";
-        $content = self::put();
-        if ($this->is_signature && !empty($signature) && (hash_hmac('sha1', \GuzzleHttp\json_encode($content, JSON_UNESCAPED_UNICODE), $this->secret) != $signature)) {
-            //TODO sha1验证失败
-            echo '{"block": true,"reply":"signature=false"}';
-            return;
-        }
-        $post_type = $content['post_type'];
-        switch ($post_type) {
-            //收到消息
-            case 'message':
-                $message_type = $content['message_type'];
-                switch ($message_type) {
-                    //私聊消息
-                    case "private":
-                        $user_id = $content['user_id'];
-                        $message = $content['message'];
-                        //消息子类型，如果是好友则是 "friend"，
-                        //如果从群或讨论组来的临时会话则分别是 "group"、"discuss"
-                        //"friend"、"group"、"discuss"、"other"
-                        $sub_type = $content['sub_type'];
-//                        echo '{"reply":"message","block": true}';
-                        break;
-                    //群消息
-                    case "group":
-                        $user_id = $content['user_id'];
-                        $message = $content['message'];
-                        $group_id = $content['group_id'];
-                        //匿名用户显示名
-                        $anonymous = $content['anonymous'];
-                        //匿名用户 flag，在调用禁言 API 时需要传入
-                        $anonymous_flag = $content['anonymous_flag'];
-                        // {"reply":"message","block": true,"at_sender":true,"kick":false,"ban":false}
-                        break;
-                    //讨论组消息
-                    case "discuss":
-                        $discuss_id = $content['discuss_id'];
-                        // {"reply":"message","block": true,"at_sender":true}
-                        //todo
-                        //以后再说吧
-                        break;
-                }
-                break;
-            //群、讨论组变动等非消息类事件
-            case 'event':
-                $event = $content['event'];
-                switch ($event) {
-                    //群管理员变动
-                    case "group_admin":
-                        //"set"、"unset"	事件子类型，分别表示设置和取消管理员
-                        $sub_type = $content['sub_type'];
-                        $group_id = $content['group_id'];
-                        $user_id = $content['user_id'];
-                        break;
-                    //群成员减少
-                    case "group_decrease":
-                        //"leave"、"kick"、"kick_me"	事件子类型，分别表示主动退群、成员被踢、登录号被踢
-                        $sub_type = $content['sub_type'];
-                        $group_id = $content['group_id'];
-                        $user_id = $content['user_id'];
-                        $operator_id = $content['operator_id'];
-                        break;
-                    //群成员增加
-                    case "group_increase":
-                        //"approve"、"invite"	事件子类型，分别表示管理员已同意入群、管理员邀请入群
-                        $sub_type = $content['sub_type'];
-                        $group_id = $content['group_id'];
-                        $user_id = $content['user_id'];
-                        $operator_id = $content['operator_id'];
-                        break;
-                    //群文件上传
-                    case "group_upload":
-                        $group_id = $content['group_id'];
-                        $user_id = $content['user_id'];
-                        #字段名	数据类型	说明
-                        #id	string	文件 ID
-                        #name	string	文件名
-                        #size	number	文件大小（字节数）
-                        #busid	number	busid（目前不清楚有什么作用）
-                        $file = $content['file'];
-                        break;
-                    //好友添加
-                    case "friend_added":
-                        $user_id = $content['user_id'];
-                        break;
-                }
-                break;
-            //加好友请求、加群请求／邀请
-            case 'request':
-                $request_type = $content['request_type'];
-                switch ($request_type) {
-                    case "friend":
-                        $user_id = $content['user_id'];
-                        $message = $content['message'];
-                        $flag = $content['flag'];
-                        //{"block": true,"approve":true,"reason":"就是拒绝你 不行啊"}
-                        break;
-                    case "group":
-                        //"add"、"invite"	请求子类型，分别表示加群请求、邀请登录号入群
-                        $sub_type = $content['sub_type'];
-                        $group_id = $content['group_id'];
-                        $user_id = $content['user_id'];
-                        $message = $content['message'];
-                        $flag = $content['flag'];
-                        //{"block": true,"approve":true,"reason":"就是拒绝你 不行啊"}
-                        break;
-                }
-                break;
-            default:
-                # code...
-                break;
-        }
-    }
-
     public static function put($param = null, $json = false)
     {
         $get = null;
@@ -729,6 +864,7 @@ class CoolQ
         }
 
     }
+
 
 }
 

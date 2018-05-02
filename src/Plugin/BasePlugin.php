@@ -27,13 +27,21 @@
 
 namespace CoolQSDK\Plugin;
 
-abstract class BasePlugin
+use CoolQSDK\PluginObserver;
+
+abstract class BasePlugin implements PluginObserver
 {
     public $Intercept;
+
+    public $coolQ = null;
 
     public function __construct()
     {
         $this->Intercept = false;
+
+        if (isset($this->coolQ)) {
+            $this->coolQ->block = $this->Intercept;
+        }
     }
 
     /**
@@ -42,6 +50,10 @@ abstract class BasePlugin
     public function setIntercept($bool = true)
     {
         $this->Intercept = $bool;
+        
+        if (isset($this->coolQ)) {
+            $this->coolQ->block = $this->Intercept;
+        }
     }
 
     /**
@@ -52,6 +64,5 @@ abstract class BasePlugin
         return $this->Intercept;
     }
 
-    public abstract function Start();
 
 }

@@ -14,7 +14,7 @@ class Response
     public static function Respose($data = [], $code = 0, $message = 'success', $status = 'ok')
     {
         $respose = null;
-        switch (CoolQ::$return_format) {
+        switch (CoolQ::getReturnFormat()) {
             case "string":
                 $respose = \GuzzleHttp\json_encode([
                     'retcode' => $code,
