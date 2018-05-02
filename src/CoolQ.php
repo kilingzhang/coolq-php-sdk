@@ -32,6 +32,7 @@ use CoolQSDK\Plugin\BasePlugin;
 use CoolQSDK\Plugin\TulingPlugin;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 
 
@@ -51,8 +52,6 @@ class CoolQ
     private $content = array();
     private $postType;
     private $plugins = array();
-
-
 
 
     public function getContent()
@@ -110,7 +109,10 @@ class CoolQ
 
         $signature = self::server('HTTP_X_SIGNATURE');
         $signature = $signature['HTTP_X_SIGNATURE'] ? substr($signature['HTTP_X_SIGNATURE'], 5, strlen($signature['HTTP_X_SIGNATURE'])) : "";
+        //TODO
         $content = self::put();
+//        $content = json_decode(file_get_contents('./put.json'), true);
+
         if ($this->isSignature && !empty($signature) && (hash_hmac('sha1', \GuzzleHttp\json_encode($content, JSON_UNESCAPED_UNICODE), $this->secret) != $signature)) {
             //TODO sha1验证失败
             echo '{"block": true,"reply":"signature=false"}';
@@ -861,6 +863,7 @@ class CoolQ
                     ]);
                     break;
             }
+        } catch (GuzzleException $e) {
         }
 
     }
