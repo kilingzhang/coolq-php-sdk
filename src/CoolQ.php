@@ -292,10 +292,7 @@ class CoolQ
 
     }
 
-    private function initAttach()
-    {
-        $this->attach(new TulingPlugin());
-    }
+
 
     public function __construct($host = '127.0.0.1:5700', $token = '', $secret = '')
     {
@@ -314,7 +311,6 @@ class CoolQ
             'timeout' => 10.0,
         ]);
 
-        $this->initAttach();
 
     }
 

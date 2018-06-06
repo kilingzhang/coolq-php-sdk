@@ -12,4 +12,6 @@ include __DIR__ . '/../vendor/autoload.php';
 
 $CoolQ = new  CoolQ('127.0.0.1:5700', 'kilingzhang', 'kilingzhang');
 
+$CoolQ->attach(new \CoolQSDK\Plugin\TulingPlugin());
+
 $CoolQ->event();
