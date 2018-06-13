@@ -6,12 +6,12 @@
  * Time: 23:20
  */
 
-namespace CoolQSDK;
+namespace CoolQSDK\Plugin;
 
 
 use CoolQSDK\Plugin\BasePlugin;
 
-interface CoolQSubject
+interface PluginSubject
 {
     // 添加/注册观察者
     public function attach(BasePlugin $observer);

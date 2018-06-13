@@ -9,6 +9,8 @@ namespace CoolQSDK;
 
 class CQ
 {
+
+
     public static function At($QQ)
     {
         return "[CQ:at,qq=$QQ]";
@@ -85,7 +87,7 @@ class CQ
 
     public static function FilterCQAt($string)
     {
-        return preg_replace('/\[CQ:at,qq=\d+\]/','',$string);
+        return preg_replace('/\[CQ:at,qq=\d+\]/', '', $string);
     }
 
     public static function DecodeHtml($message)
@@ -94,6 +96,14 @@ class CQ
         $message = preg_replace("/&#91;/", "[", $message);
         $message = preg_replace("/&#93;/", "]", $message);
         return $message;
+    }
+
+
+    public static function isAtMe($message, $QQ)
+    {
+        $cq = self::At($QQ);
+        $pos = strpos($message, $cq);
+        return $pos !== false ? true : false;
     }
 
 }

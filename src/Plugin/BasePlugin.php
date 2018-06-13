@@ -27,22 +27,38 @@
 
 namespace CoolQSDK\Plugin;
 
-use CoolQSDK\PluginObserver;
+
+use CoolQSDK\Log;
+use CoolQSDK\Time;
 
 abstract class BasePlugin implements PluginObserver
 {
     public $Intercept;
-
+    private $startTime;
     public $coolQ = null;
+
+    abstract public function PluginName();
 
     public function __construct()
     {
+        $this->startTime = Time::getMicrotime();
+
         $this->Intercept = false;
 
         if (isset($this->coolQ)) {
             $this->coolQ->block = $this->Intercept;
         }
+
+
     }
+
+
+    public function __destruct()
+    {
+        // TODO: Implement __destruct() method.
+        Log::info($this->PluginName() . ' 共耗时：' . Time::ComMicritime($this->startTime, Time::getMicrotime()) . '秒' . '--------------END------------');
+    }
+
 
     /**
      * @param bool $bool
@@ -50,7 +66,7 @@ abstract class BasePlugin implements PluginObserver
     public function setIntercept($bool = true)
     {
         $this->Intercept = $bool;
-        
+
         if (isset($this->coolQ)) {
             $this->coolQ->block = $this->Intercept;
         }

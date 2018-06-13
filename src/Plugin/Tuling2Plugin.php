@@ -15,7 +15,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\RequestOptions;
 
-class TulingPlugin extends BasePlugin
+class Tuling2Plugin extends BasePlugin
 {
 
     private $apiKey = 'acd777bd268347978677e9c48a637c9c';
@@ -216,6 +216,6 @@ class TulingPlugin extends BasePlugin
 
     public function PluginName()
     {
-        return 'TulingPlugin';
+        return 'Tuling2Plugin';
     }
 }

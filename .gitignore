@@ -3,3 +3,4 @@
 composer.lock
 Resopnse.md
 /tests/put.json
+/tests/logs

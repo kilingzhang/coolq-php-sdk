@@ -6,8 +6,10 @@
  * Time: 23:21
  */
 
-namespace CoolQSDK;
+namespace CoolQSDK\Plugin;
 
+
+use CoolQSDK\CoolQ;
 
 interface PluginObserver
 {

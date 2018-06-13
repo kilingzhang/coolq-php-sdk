@@ -29,29 +29,46 @@
 namespace CoolQSDK;
 
 use CoolQSDK\Plugin\BasePlugin;
-use CoolQSDK\Plugin\TulingPlugin;
+use CoolQSDK\Plugin\PluginSubject;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 
 
-class CoolQ
+class CoolQ implements PluginSubject
 {
     private $host;
     private $token;
     private $secret = '';
     private $isSignature = true;
     private $isAsync = false;
-    private static $client;
-    private static $options;
     private $block = false;
-
-    private static $returnFormat = 'string';
-
+    private $debug = false;
     private $content = array();
     private $postType;
     private $plugins = array();
+
+    private $loggerPath = './logs/coolq.log';
+    private $loggerName = 'coolq';
+    private $startTime;
+
+    private static $client;
+    private static $options;
+    private static $returnFormat = 'string';
+
+
+    public function setDebug($isDebug = true)
+    {
+        return $this->debug = $isDebug;
+    }
+
+    public function getDebug()
+    {
+        return $this->debug;
+    }
 
 
     public function getContent()
@@ -87,6 +104,7 @@ class CoolQ
                         $plugin->message($this);
                         break;
                     //群、讨论组变动等非消息类事件
+                    case 'notice':
                     case 'event':
                         $plugin->event($this);
                         break;
@@ -102,7 +120,6 @@ class CoolQ
         }
         $this->block = false;
     }
-
 
     public function event()
     {
@@ -293,9 +310,15 @@ class CoolQ
     }
 
 
-
     public function __construct($host = '127.0.0.1:5700', $token = '', $secret = '')
     {
+
+        Log::setLoggerName($this->loggerName);
+        Log::setLoggerPath($this->loggerPath);
+        Log::info('---------------------------START-----------');
+
+        $this->startTime = Time::getMicrotime();
+
         $this->host = $host;
         //TODO  匹配是否合法URI
 
@@ -813,13 +836,21 @@ class CoolQ
 
     public function CURL($uri = URL::get_version_info, $param = [], $method = 'GET')
     {
+        $start_time = Time::getMicrotime();
         try {
+
             $response = self::$client->request($method, $uri, array_merge(self::$options, [
                 'query' => $param
             ]));
+
+            $end_time = Time::getMicrotime();
+
             if ($response->getStatusCode() == 200) {
-                return Response::Ok($response->getBody());
+                $response = $response->getBody();
+                Log::info($uri . ' ->' . Time::ComMicritime($start_time, $end_time), [$param, $response]);
+                return Response::Ok($response);
             }
+            Log::error($uri . ' ->' . Time::ComMicritime($start_time, $end_time), [$param, $response->getBody()]);
         } catch (ClientException $e) {
             //如果 http_errors 请求参数设置成true，在400级别的错误的时候将会抛出
             switch ($e->getCode()) {
@@ -864,6 +895,12 @@ class CoolQ
 
     }
 
+
+
+    public function __destruct()
+    {
+        Log::info('共耗时：'.Time::ComMicritime($this->startTime, Time::getMicrotime()) . '秒' . '--------------END------------');
+    }
 
 }
 
