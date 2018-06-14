@@ -65,13 +65,13 @@ class Tuling2Plugin extends BasePlugin
             //群消息
             case "group":
 
-                if (self::$selfQq == null) {
+                if (self::getSelfQq() == null) {
                     $loginInfo = json_decode($coolQ->getLoginInfo(), true);
                     if ($loginInfo['retcode'] !== 0) {
                         $coolQ->sendGroupMsg($content['group_id'], '机器人信息获取失败');
                         return;
                     }
-                    self::$selfQq = $loginInfo['data']['user_id'];
+                    self::setSelfQq($loginInfo['data']['user_id']);
                 }
 
                 if (empty($this->apiKey)) {
@@ -213,6 +213,23 @@ class Tuling2Plugin extends BasePlugin
         }
 
     }
+
+    /**
+     * @return int
+     */
+    public static function getSelfQq(): int
+    {
+        return self::$selfQq;
+    }
+
+    /**
+     * @param int $selfQq
+     */
+    public static function setSelfQq(int $selfQq)
+    {
+        self::$selfQq = $selfQq;
+    }
+
 
     public function PluginName()
     {

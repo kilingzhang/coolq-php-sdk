@@ -30,12 +30,13 @@ namespace CoolQSDK;
 
 use CoolQSDK\Plugin\BasePlugin;
 use CoolQSDK\Plugin\PluginSubject;
+use CoolQSDK\Support\Log;
+use CoolQSDK\Support\Time;
+use Dotenv\Dotenv;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
 
 
 class CoolQ implements PluginSubject
@@ -51,8 +52,6 @@ class CoolQ implements PluginSubject
     private $postType;
     private $plugins = array();
 
-    private $loggerPath = './logs/coolq.log';
-    private $loggerName = 'coolq';
     private $startTime;
 
     private static $client;
@@ -313,8 +312,12 @@ class CoolQ implements PluginSubject
     public function __construct($host = '127.0.0.1:5700', $token = '', $secret = '')
     {
 
-        Log::setLoggerName($this->loggerName);
-        Log::setLoggerPath($this->loggerPath);
+        $dotenv = new Dotenv(__DIR__ . '/../');
+        $dotenv->load();
+
+
+        Log::setLoggerName(getenv('APP_NAME'));
+        Log::setLoggerPath(getenv('LOG_PATH'));
         Log::info('---------------------------START-----------');
 
         $this->startTime = Time::getMicrotime();
@@ -896,10 +899,13 @@ class CoolQ implements PluginSubject
     }
 
 
-
     public function __destruct()
     {
-        Log::info('共耗时：'.Time::ComMicritime($this->startTime, Time::getMicrotime()) . '秒' . '--------------END------------');
+        $count = count($this->plugins);
+        for ($i = 0; $i < $count; $i++) {
+            unset($this->plugins[$i]);
+        }
+        Log::info('共耗时：' . Time::ComMicritime($this->startTime, Time::getMicrotime()) . '秒' . '--------------END------------');
     }
 
 }

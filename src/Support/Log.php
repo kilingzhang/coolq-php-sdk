@@ -6,7 +6,7 @@
  * Time: 0:08
  */
 
-namespace CoolQSDK;
+namespace CoolQSDK\Support;
 
 
 use Monolog\Handler\StreamHandler;
@@ -19,11 +19,11 @@ class Log
     private static $loggerName = null;
     private static $loggerId = null;
 
-    private function __construct($name)
+    private function __construct()
     {
-        $logger = new Logger($name);
+        $logger = new Logger(getenv('APP_NAME','COOLQ'));
         try {
-            $logger->pushHandler(new StreamHandler(self::$loggerPath, Logger::INFO));
+            $logger->pushHandler(new StreamHandler(getenv('LOG_PATH','./logs/coolq.log'), Logger::INFO));
         } catch (\Exception $e) {
         }
         self::$loggerInstance = $logger;
@@ -105,8 +105,6 @@ class Log
         }
         self::$loggerName = $loggerName;
     }
-
-
 
 
 }

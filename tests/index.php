@@ -23,7 +23,6 @@ $CoolQ = new  CoolQ('127.0.0.1:5700', 'kilingzhang', 'kilingzhang');
 echo "<pre>";
 var_dump(
 
-    $CoolQ->sendPrivateMsg(1353693508, 194233857, false),
-    $CoolQ->getLogMsg()
+    $CoolQ->sendPrivateMsg(1353693508, 194233857, false)
 
 );

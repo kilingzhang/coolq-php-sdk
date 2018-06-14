@@ -28,8 +28,8 @@
 namespace CoolQSDK\Plugin;
 
 
-use CoolQSDK\Log;
-use CoolQSDK\Time;
+use CoolQSDK\Support\Log;
+use CoolQSDK\Support\Time;
 
 abstract class BasePlugin implements PluginObserver
 {

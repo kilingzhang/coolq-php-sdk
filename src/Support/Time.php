@@ -6,7 +6,7 @@
  * Time: 23:56
  */
 
-namespace CoolQSDK;
+namespace CoolQSDK\Support;
 
 
 class Time
