@@ -39,43 +39,43 @@ class Response
 
     }
 
-    public static function Ok($response)
+    public static function ok($response)
     {
         if (empty($response) || ($data = \GuzzleHttp\json_decode($response, true)) == null) {
-            return self::Error();
+            return self::error();
         }
-        return self::Respose($data['data'], $data['retcode'], self::getMessage($data['retcode']), $data['status']);
+        return self::respose($data['data'], $data['retcode'], self::getMessage($data['retcode']), $data['status']);
     }
 
-    public static function AccessTokenError()
+    public static function accessTokenError()
     {
-        return self::Respose([], 403, self::getMessage(403), 'failed');
+        return self::respose([], 403, self::getMessage(403), 'failed');
     }
 
 
-    public static function AccessTokenNoneError()
+    public static function accessTokenNoneError()
     {
-        return self::Respose([], 401, self::getMessage(401), 'failed');
+        return self::respose([], 401, self::getMessage(401), 'failed');
     }
 
-    public static function NotFoundResourceError()
+    public static function notFoundResourceError()
     {
-        return self::Respose([], 404, self::getMessage(404), 'failed');
+        return self::respose([], 404, self::getMessage(404), 'failed');
     }
 
-    public static function ContentTypeError()
+    public static function contentTypeError()
     {
-        return self::Respose([], 406, self::getMessage(406), 'failed');
+        return self::respose([], 406, self::getMessage(406), 'failed');
     }
 
-    public static function PluginServerError()
+    public static function pluginServerError()
     {
-        return self::Respose([], -2333, self::getMessage(-2333), 'failed');
+        return self::respose([], -2333, self::getMessage(-2333), 'failed');
     }
 
-    public static function Error($data = [])
+    public static function error($data = [])
     {
-        return self::Respose($data, 500, self::getMessage(500), 'failed');
+        return self::respose($data, 500, self::getMessage(500), 'failed');
     }
 
     public static function getMessage($retcode)

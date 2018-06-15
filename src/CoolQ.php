@@ -16,7 +16,7 @@ use GuzzleHttp\Exception\RequestException;
 class CoolQ extends CoolQBase
 {
 
-    function CURL($uri = URL::get_version_info, $param = [], $method = 'GET')
+    function curl($uri = Url::get_version_info, $param = [], $method = 'GET')
     {
         try {
 
@@ -25,30 +25,30 @@ class CoolQ extends CoolQBase
             ]));
             if ($response->getStatusCode() == 200) {
                 $response = $response->getBody();
-                return Response::Ok($response);
+                return Response::ok($response);
             }
         } catch (ClientException $e) {
             //如果 http_errors 请求参数设置成true，在400级别的错误的时候将会抛出
             switch ($e->getCode()) {
                 case 400:
-                    return Response::NotFoundResourceError();
+                    return Response::notFoundResourceError();
                     break;
                 case 401:
                     //401 配置文件中已填写access_token 初始化CoolQ对象时未传值
-                    return Response::AccessTokenNoneError();
+                    return Response::accessTokenNoneError();
                     break;
                 case 403:
                     //403 验证access_token错误
-                    return Response::AccessTokenError();
+                    return Response::accessTokenError();
                     break;
                 case 404:
-                    return Response::NotFoundResourceError();
+                    return Response::notFoundResourceError();
                     break;
                 case 406:
-                    return Response::ContentTypeError();
+                    return Response::contentTypeError();
                     break;
                 default:
-                    return Response::Error([
+                    return Response::error([
                         'message' => $e->getMessage()
                     ]);
                     break;
@@ -58,10 +58,10 @@ class CoolQ extends CoolQBase
             //一般为coolq-http-api插件未开启 接口地址无法访问
             switch ($e->getCode()) {
                 case 0:
-                    return Response::PluginServerError();
+                    return Response::pluginServerError();
                     break;
                 default:
-                    return Response::Error([
+                    return Response::error([
                         'message' => $e->getMessage()
                     ]);
                     break;
@@ -87,6 +87,7 @@ class CoolQ extends CoolQBase
         $postType = $content['post_type'];
         switch ($postType) {
             //收到消息
+            case 'comment ': //4.0
             case 'message':
                 //TODO 消息处理
                 $message_type = $content['message_type'];
@@ -146,9 +147,10 @@ class CoolQ extends CoolQBase
                 }
                 break;
             //群、讨论组变动等非消息类事件
+            case 'notice': //兼容4.0
             case 'event':
                 //TODO 事件处理
-                $event = $content['event'];
+                $event = empty($content['event']) ?? $content['notice_type'];
                 switch ($event) {
                     //群管理员变动
                     case "group_admin":

@@ -3,21 +3,18 @@
 通过对 [CoolQ HTTP API 插件](https://cqhttp.cc/docs/) 插件的封装，方便phper直接调用 [CoolQ HTTP API 插件](https://cqhttp.cc/docs/) 插件的各种api。并且已集成对上报事件的封装。未来版本将加入基于 [CoolQ HTTP API 插件](https://cqhttp.cc/docs/) 开发酷Q插件的基础上报事件封装基础类。尽量做到PHP开发QQ机器人一步到位。
 
 ## 快速开始
+### 环境
+```
+PHP >= 7.0
+
+```
 
 ### 安装
 #### composer快速安装（推荐）     
 ```
 composer require kilingzhang/coolq-php-sdk
 ```
-#### 或在 ```composer.json``` ```require``` 字段下添加    
-```
 
-"require": {
-        ... ,
-        "kilingzhang/coolq-php-sdk": "^1.0"
-    },
-
-```
 
 ### 基本使用
 
@@ -34,15 +31,14 @@ composer require kilingzhang/coolq-php-sdk
 ```
 
 use CoolQSDK\CoolQ;
-use CoolQSDK\Response;
 
-require_once __DIR__ . '/vendor/autoload.php';
+include __DIR__ . '/../vendor/autoload.php';
 
-$CoolQ = new  CoolQ('127.0.0.1:5700', 'your-access_token', 'your-secret');
+$CoolQ = new  CoolQ('127.0.0.1:5700', 'kilingzhang', 'kilingzhang');
 
 //$CoolQ->setReturnFormat('array');
 
-echo $CoolQ->getLoginInfo();
+$CoolQ->event();
 
 
 ```
@@ -76,8 +72,8 @@ echo $CoolQ->getLoginInfo();
 
 - 添加获取群列表
 - 添加POST提交事件方式
-- 升级SDK 同步cqhttp3.x版本插件
-- 兼容cqhttp2.x版本
+- 升级SDK 同步cqhttp4.x版本插件
+- 兼容cqhttp3.x,2.x版本
 
 ## API参数描述 
 [API参数描述](https://cqhttp.cc/docs/)

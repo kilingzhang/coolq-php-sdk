@@ -9,7 +9,7 @@
 namespace CoolQSDK;
 
 
-class URL
+class Url
 {
     const send_private_msg = '/send_private_msg';
     const send_private_msg_async = '/send_private_msg_async';

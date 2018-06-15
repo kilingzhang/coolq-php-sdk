@@ -47,43 +47,7 @@ abstract class CoolQBase
     protected static $options;
     private static $returnFormat = 'string';
 
-
-    public function getContent()
-    {
-        return $this->content;
-    }
-
-    /**
-     * @param array $putParams
-     */
-    public function setPutParams($putParams)
-    {
-        $this->putParams = $putParams;
-    }
-
-    /**
-     * @return array
-     */
-    public function getPutParams()
-    {
-        return $this->putParams;
-    }
-
-
-    public function isHMAC()
-    {
-        $signature = self::server('HTTP_X_SIGNATURE');
-        $signature = $signature['HTTP_X_SIGNATURE'] ? substr($signature['HTTP_X_SIGNATURE'], 5, strlen($signature['HTTP_X_SIGNATURE'])) : "";
-        //TODO
-        $this->putParams = self::put(true);
-//        file_put_contents('./put.json', $content);
-//        $content = json_decode(file_get_contents('./put.json'), true);
-        if ($this->isSignature && !empty($signature) && (hash_hmac('sha1', \GuzzleHttp\json_encode($this->putParams, JSON_UNESCAPED_UNICODE), $this->secret) != $signature)) {
-            //TODO sha1验证失败
-            return false;
-        }
-        return true;
-    }
+    abstract function curl($uri = Url::get_version_info, $param = [], $method = 'GET');
 
     abstract function event();
 
@@ -110,6 +74,42 @@ abstract class CoolQBase
 
     }
 
+    public function getContent(): array
+    {
+        return $this->content;
+    }
+
+    /**
+     * @param array $putParams
+     */
+    public function setPutParams(array $putParams)
+    {
+        $this->putParams = $putParams;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPutParams(): array
+    {
+        return $this->putParams;
+    }
+
+    public function isHMAC(): bool
+    {
+        $signature = self::server('HTTP_X_SIGNATURE');
+        $signature = $signature['HTTP_X_SIGNATURE'] ? substr($signature['HTTP_X_SIGNATURE'], 5, strlen($signature['HTTP_X_SIGNATURE'])) : "";
+        //TODO
+        $this->putParams = self::put(true);
+//        file_put_contents('./put.json', $content);
+//        $content = json_decode(file_get_contents('./put.json'), true);
+        if ($this->isSignature && !empty($signature) && (hash_hmac('sha1', \GuzzleHttp\json_encode($this->putParams, JSON_UNESCAPED_UNICODE), $this->secret) != $signature)) {
+            //TODO sha1验证失败
+            return false;
+        }
+        return true;
+    }
+
     /**
      * @return string
      */
@@ -121,7 +121,7 @@ abstract class CoolQBase
     /**
      * @param string $token
      */
-    public function setToken($token)
+    public function setToken(string $token)
     {
         $this->token = $token;
     }
@@ -129,7 +129,7 @@ abstract class CoolQBase
     /**
      * @return string
      */
-    public function getSecret()
+    public function getSecret(): string
     {
         return $this->secret;
     }
@@ -137,7 +137,7 @@ abstract class CoolQBase
     /**
      * @param string $secret
      */
-    public function setSecret($secret)
+    public function setSecret(string $secret)
     {
         $this->secret = $secret;
     }
@@ -145,7 +145,7 @@ abstract class CoolQBase
     /**
      * @return bool
      */
-    public function isSignature()
+    public function isSignature(): bool
     {
         return $this->isSignature;
     }
@@ -153,7 +153,7 @@ abstract class CoolQBase
     /**
      * @param bool $isSignature
      */
-    public function setIsSignature($isSignature)
+    public function setIsSignature(bool $isSignature)
     {
         $this->isSignature = $isSignature;
     }
@@ -161,7 +161,7 @@ abstract class CoolQBase
     /**
      * @return bool
      */
-    public function isAsync()
+    public function isAsync(): bool
     {
         return $this->isAsync;
     }
@@ -169,11 +169,10 @@ abstract class CoolQBase
     /**
      * @param bool $isAsync
      */
-    public function setIsAsync($isAsync)
+    public function setIsAsync(bool $isAsync)
     {
         $this->isAsync = $isAsync;
     }
-
 
     /**
      * @return string
@@ -186,7 +185,7 @@ abstract class CoolQBase
     /**
      * @param string $returnFormat
      */
-    public static function setReturnFormat($returnFormat)
+    public static function setReturnFormat(string $returnFormat)
     {
         $formats = [
             'string',
@@ -197,97 +196,97 @@ abstract class CoolQBase
         }
     }
 
-    public function sendPrivateMsg($user_id, $message, $auto_escape = false, $async = null)
+    public function sendPrivateMsg(int $user_id, string $message, bool $auto_escape = false, bool $async = null)
     {
         if ((is_null($async) && $this->isAsync) || $async === true) {
             return $this->sendPrivateMsgAsync($user_id, $message, $auto_escape);
         }
 
-        $uri = URL::send_private_msg;
+        $uri = Url::send_private_msg;
         $param = [
             'user_id' => $user_id,
             'message' => $message,
             'auto_escape' => $auto_escape,
             'is_raw' => $auto_escape,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function sendPrivateMsgAsync($user_id, $message, $auto_escape = false)
+    public function sendPrivateMsgAsync(int $user_id, string $message, bool $auto_escape = false)
     {
-        $uri = URL::send_private_msg_async;
+        $uri = Url::send_private_msg_async;
         $param = [
             'user_id' => $user_id,
             'message' => $message,
             'auto_escape' => $auto_escape,
             'is_raw' => $auto_escape,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function sendGroupMsg($group_id, $message, $auto_escape = false, $async = null)
+    public function sendGroupMsg(int $group_id, string $message, bool $auto_escape = false, bool $async = null)
     {
         if ((is_null($async) && $this->isAsync) || $async === true) {
             return $this->sendGroupMsgAsync($group_id, $message, $auto_escape);
         }
 
-        $uri = URL::send_group_msg;
+        $uri = Url::send_group_msg;
         $param = [
             'group_id' => $group_id,
             'message' => $message,
             'auto_escape' => $auto_escape,
             'is_raw' => $auto_escape,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function sendGroupMsgAsync($group_id, $message, $auto_escape = false)
+    public function sendGroupMsgAsync(int $group_id, string $message, bool $auto_escape = false)
     {
-        $uri = URL::send_group_msg_async;
+        $uri = Url::send_group_msg_async;
         $param = [
             'group_id' => $group_id,
             'message' => $message,
             'auto_escape' => $auto_escape,
             'is_raw' => $auto_escape,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function sendDiscussMsg($discuss_id, $message, $auto_escape = false, $async = null)
+    public function sendDiscussMsg(int $discuss_id, string $message, bool $auto_escape = false, bool $async = null)
     {
         if ((is_null($async) && $this->isAsync) || $async === true) {
             return $this->sendDiscussMsgAsync($discuss_id, $message, $auto_escape);
         }
 
-        $uri = URL::send_discuss_msg;
+        $uri = Url::send_discuss_msg;
         $param = [
             'discuss_id' => $discuss_id,
             'message' => $message,
             'auto_escape' => $auto_escape,
             'is_raw' => $auto_escape,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function sendDiscussMsgAsync($discuss_id, $message, $auto_escape = false)
+    public function sendDiscussMsgAsync(int $discuss_id, string $message, bool $auto_escape = false)
     {
-        $uri = URL::send_discuss_msg_async;
+        $uri = Url::send_discuss_msg_async;
         $param = [
             'discuss_id' => $discuss_id,
             'message' => $message,
             'auto_escape' => $auto_escape,
             'is_raw' => $auto_escape,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function sendMsg($message_type, $id, $message, $auto_escape = false, $async = null)
+    public function sendMsg(string $message_type, int $id, string $message, bool $auto_escape = false, bool $async = null)
     {
         if ((is_null($async) && $this->isAsync) || $async === true) {
             return $this->sendMsgAsync($message_type, $id, $message, $auto_escape);
         }
 
-        $uri = URL::send_msg;
+        $uri = Url::send_msg;
         $param = [
             'message_type' => $message_type,
             'user_id' => $id,
@@ -297,12 +296,12 @@ abstract class CoolQBase
             'auto_escape' => $auto_escape,
             'is_raw' => $auto_escape,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function sendMsgAsync($message_type, $id, $message, $auto_escape = false)
+    public function sendMsgAsync(string $message_type, int $id, string $message, bool $auto_escape = false)
     {
-        $uri = URL::send_msg;
+        $uri = Url::send_msg;
         $param = [
             'message_type' => $message_type,
             'user_id' => $id,
@@ -312,213 +311,213 @@ abstract class CoolQBase
             'auto_escape' => $auto_escape,
             'is_raw' => $auto_escape,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function deleteMsg($message_id)
+    public function deleteMsg(int $message_id)
     {
-        $uri = URL::delete_msg;
+        $uri = Url::delete_msg;
         $param = [
             'message_id' => $message_id,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function sendLike($user_id, $times = 1)
+    public function sendLike(int $user_id, int $times = 1)
     {
-        $uri = URL::send_like;
+        $uri = Url::send_like;
         $param = [
             'user_id' => $user_id,
             'times' => $times,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function setGroupKick($group_id, $user_id, $reject_add_request = false)
+    public function setGroupKick(int $group_id, int $user_id, bool $reject_add_request = false)
     {
-        $uri = URL::set_group_kick;
+        $uri = Url::set_group_kick;
         $param = [
             'group_id' => $group_id,
             'user_id' => $user_id,
             'reject_add_request' => $reject_add_request,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function setGroupBan($group_id, $user_id, $duration = 30 * 60)
+    public function setGroupBan(int $group_id, int $user_id, int $duration = 30 * 60)
     {
-        $uri = URL::set_group_ban;
+        $uri = Url::set_group_ban;
         $param = [
             'group_id' => $group_id,
             'user_id' => $user_id,
             'duration' => $duration,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function setGroupAnonymousBan($group_id, $flag, $duration = 30 * 60)
+    public function setGroupAnonymousBan(int $group_id, string $flag, int $duration = 30 * 60)
     {
-        $uri = URL::set_group_anonymous_ban;
+        $uri = Url::set_group_anonymous_ban;
         $param = [
             'group_id' => $group_id,
             'flag' => $flag,
             'duration' => $duration,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function setGroupWholeBan($group_id, $enable = true)
+    public function setGroupWholeBan(int $group_id, bool $enable = true)
     {
-        $uri = URL::set_group_whole_ban;
+        $uri = Url::set_group_whole_ban;
         $param = [
             'group_id' => $group_id,
             'enable' => $enable,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function setGroupAdmin($group_id, $user_id, $enable = true)
+    public function setGroupAdmin(int $group_id, int $user_id, bool $enable = true)
     {
-        $uri = URL::set_group_admin;
+        $uri = Url::set_group_admin;
         $param = [
             'group_id' => $group_id,
             'user_id' => $user_id,
             'enable' => $enable,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function setGroupAnonymous($group_id, $enable = true)
+    public function setGroupAnonymous(int $group_id, bool $enable = true)
     {
-        $uri = URL::set_group_anonymous;
+        $uri = Url::set_group_anonymous;
         $param = [
             'group_id' => $group_id,
             'enable' => $enable,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function setGroupCard($group_id, $user_id, $card = null)
+    public function setGroupCard(int $group_id, int $user_id, string $card = null)
     {
-        $uri = URL::set_group_card;
+        $uri = Url::set_group_card;
         $param = [
             'group_id' => $group_id,
             'user_id' => $user_id,
             'card' => $card,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function setGroupLeave($group_id, $is_dismiss = false)
+    public function setGroupLeave(int $group_id, bool $is_dismiss = false)
     {
-        $uri = URL::set_group_leave;
+        $uri = Url::set_group_leave;
         $param = [
             'group_id' => $group_id,
             'is_dismiss' => $is_dismiss,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function setGroupSpecialTitle($group_id, $user_id, $special_title = null, $duration = -1)
+    public function setGroupSpecialTitle(int $group_id, int $user_id, string $special_title = null, int $duration = -1)
     {
-        $uri = URL::set_group_special_title;
+        $uri = Url::set_group_special_title;
         $param = [
             'group_id' => $group_id,
             'user_id' => $user_id,
             'special_title' => $special_title,
             'duration' => $duration,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function setDiscussLeave($discuss_id)
+    public function setDiscussLeave(int $discuss_id)
     {
-        $uri = URL::set_discuss_leave;
+        $uri = Url::set_discuss_leave;
         $param = [
             'discuss_id' => $discuss_id,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function setFriendAddRequest($flag, $approve = true, $remark = '')
+    public function setFriendAddRequest(string $flag, bool $approve = true, string $remark = '')
     {
-        $uri = URL::set_friend_add_request;
+        $uri = Url::set_friend_add_request;
         $param = [
             'flag' => $flag,
             'approve' => $approve,
             'remark' => $remark,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function setGroupAddRequest($flag, $type, $approve = true, $reason = '')
+    public function setGroupAddRequest(string $flag, string $type, bool $approve = true, string $reason = '')
     {
-        $uri = URL::set_group_add_request;
+        $uri = Url::set_group_add_request;
         $param = [
             'flag' => $flag,
             'type' => $type,
             'approve' => $approve,
             'reason' => $reason,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
     public function getLoginInfo()
     {
-        $uri = URL::get_login_info;
+        $uri = Url::get_login_info;
         $param = [];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function getStrangerInfo($user_id, $no_cache = false)
+    public function getStrangerInfo(int $user_id, bool $no_cache = false)
     {
-        $uri = URL::get_stranger_info;
+        $uri = Url::get_stranger_info;
         $param = [
             'user_id' => $user_id,
             'no_cache' => $no_cache,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
     public function getGroupList()
     {
-        $uri = URL::get_group_list;
+        $uri = Url::get_group_list;
         $param = [];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function getGroupMemberInfo($group_id, $user_id, $no_cache = false)
+    public function getGroupMemberInfo(int $group_id, int $user_id, bool $no_cache = false)
     {
-        $uri = URL::get_group_member_info;
+        $uri = Url::get_group_member_info;
         $param = [
             'group_id' => $group_id,
             'user_id' => $user_id,
             'no_cache' => $no_cache,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public function getGroupMemberList($group_id)
+    public function getGroupMemberList(int $group_id)
     {
-        $uri = URL::get_group_member_list;
+        $uri = Url::get_group_member_list;
         $param = [
             'group_id' => $group_id,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
     public function getCookies()
     {
-        $uri = URL::get_cookies;
+        $uri = Url::get_cookies;
         $param = [];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
     public function getCsrfToken()
     {
-        $uri = URL::get_csrf_token;
+        $uri = Url::get_csrf_token;
         $param = [];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
     /**
@@ -526,65 +525,65 @@ abstract class CoolQBase
      * @param $out_format 要转换到的格式，目前支持 mp3、amr、wma、m4a、spx、ogg、wav、flac
      * @return string
      */
-    public function getRecord($file, $out_format)
+    public function getRecord(string $file, string $out_format)
     {
-        $uri = URL::get_record;
+        $uri = Url::get_record;
         $param = [
             'file' => $file,
             'out_format' => $out_format,
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
     public function getStatus()
     {
-        $uri = URL::get_status;
+        $uri = Url::get_status;
         $param = [];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
     public function getVersionInfo()
     {
-        $uri = URL::get_version_info;
+        $uri = Url::get_version_info;
         $param = [];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
     public function setRestart()
     {
-        $uri = URL::set_restart;
+        $uri = Url::set_restart;
         $param = [];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
     public function setRestartPlugin()
     {
-        $uri = URL::set_restart_plugin;
+        $uri = Url::set_restart_plugin;
         $param = [];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
     /**
      * @param string $data_dir 收到清理的目录名，支持 image、record、show、bface
      * @return string
      */
-    public function cleanDataDir($data_dir = '')
+    public function cleanDataDir(string $data_dir = '')
     {
-        $uri = URL::clean_data_dir;
+        $uri = Url::clean_data_dir;
         $param = [
             'data_dir' => $data_dir
         ];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
     public function __getFriendList()
     {
-        $uri = URL::_get_friend_list;
+        $uri = Url::_get_friend_list;
         $param = [];
-        return $this->CURL($uri, $param);
+        return $this->curl($uri, $param);
     }
 
-    public static function put($isJson = false)
+    public static function put(bool $isJson = false)
     {
         $content = file_get_contents('php://input');
         if ($isJson) {
@@ -593,10 +592,10 @@ abstract class CoolQBase
         return json_decode($content, true);
     }
 
-    public static function server($param = null, $default = '')
+    public static function server(array $param = array(), string $default = ''): array
     {
         $get = null;
-        $param == null && $get = $_SERVER;
+        empty($param) && $get = $_SERVER;
         if (is_array($param) && count($param) > 0) {
             foreach ($param as $item) {
                 $get[$item] = isset($_SERVER[$item]) ? $_SERVER[$item] : $default;
@@ -606,8 +605,6 @@ abstract class CoolQBase
         }
         return $get;
     }
-
-    abstract function CURL($uri = URL::get_version_info, $param = [], $method = 'GET');
 
 
 }

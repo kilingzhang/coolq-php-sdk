@@ -11,57 +11,57 @@ class CQ
 {
 
 
-    public static function At($QQ)
+    public static function at(string $QQ): string
     {
         return "[CQ:at,qq=$QQ]";
     }
 
-    public static function Face($id)
+    public static function face($id)
     {
         return "[CQ:face,id=$id] ";
     }
 
-    public static function Emoji($id)
+    public static function emoji($id)
     {
         return "[CQ:emoji,id=$id] ";
     }
 
-    public static function Bface($id)
+    public static function bFace($id)
     {
         return "[CQ:bface,id=$id] ";
     }
 
-    public static function Sface($id)
+    public static function sFace($id)
     {
         return "[CQ:sface,id=$id] ";
     }
 
-    public static function Image($url)
+    public static function image($url)
     {
         return "[CQ:image,file=$url] ";
     }
 
-    public static function Record($url)
+    public static function record($url)
     {
         return "[CQ:record,file=$url] ";
     }
 
-    public static function Rps($type)
+    public static function rps($type)
     {
         return "[CQ:rps,type=$type] ";
     }
 
-    public static function Dice($type)
+    public static function dice($type)
     {
         return "[CQ:dice,type=$type] ";
     }
 
-    public static function Shake()
+    public static function shake()
     {
         return "[CQ:shake] ";
     }
 
-    public static function Anonymouse($ignore)
+    public static function anonymouse($ignore)
     {
         if ($ignore) {
             return "[CQ:anonymous,ignore=true] ";
@@ -70,27 +70,27 @@ class CQ
         }
     }
 
-    public static function Music($type, $id)
+    public static function music($type, $id)
     {
         return "[CQ:music,type=$type,id=$id]";
     }
 
-    public static function DiyMusic($type = custom, $url, $audio, $title, $content, $image)
+    public static function diyMusic($type = custom, $url, $audio, $title, $content, $image)
     {
         return "[CQ:music,type=custom,url=$url,audio=$audio,title=$title,content=$content,image=$image] ";
     }
 
-    public static function Share($url, $title, $content, $image)
+    public static function share($url, $title, $content, $image)
     {
         return "[CQ:share,url=$url,title=$title,content=$content,image=$image] ";
     }
 
-    public static function FilterCQAt($string)
+    public static function filterCQAt($string)
     {
         return preg_replace('/\[CQ:at,qq=\d+\]/', '', $string);
     }
 
-    public static function DecodeHtml($message)
+    public static function decodeHtml($message)
     {
         $message = preg_replace("/&amp;/", "&", $message);
         $message = preg_replace("/&#91;/", "[", $message);
@@ -101,7 +101,7 @@ class CQ
 
     public static function isAtMe($message, $QQ)
     {
-        $cq = self::At($QQ);
+        $cq = self::at($QQ);
         $pos = strpos($message, $cq);
         return $pos !== false ? true : false;
     }
