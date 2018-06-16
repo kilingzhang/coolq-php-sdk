@@ -16,62 +16,7 @@ use GuzzleHttp\Exception\RequestException;
 class CoolQ extends CoolQBase
 {
 
-    function curl($uri = Url::get_version_info, $param = [], $method = 'GET')
-    {
-        try {
-
-            $response = self::$client->request($method, $uri, array_merge(self::$options, [
-                'query' => $param
-            ]));
-            if ($response->getStatusCode() == 200) {
-                $response = $response->getBody();
-                return Response::ok($response);
-            }
-        } catch (ClientException $e) {
-            //如果 http_errors 请求参数设置成true，在400级别的错误的时候将会抛出
-            switch ($e->getCode()) {
-                case 400:
-                    return Response::notFoundResourceError();
-                    break;
-                case 401:
-                    //401 配置文件中已填写access_token 初始化CoolQ对象时未传值
-                    return Response::accessTokenNoneError();
-                    break;
-                case 403:
-                    //403 验证access_token错误
-                    return Response::accessTokenError();
-                    break;
-                case 404:
-                    return Response::notFoundResourceError();
-                    break;
-                case 406:
-                    return Response::contentTypeError();
-                    break;
-                default:
-                    return Response::error([
-                        'message' => $e->getMessage()
-                    ]);
-                    break;
-            }
-        } catch (RequestException $e) {
-            //在发送网络错误(连接超时、DNS错误等)时，将会抛出 GuzzleHttp\Exception\RequestException 异常。
-            //一般为coolq-http-api插件未开启 接口地址无法访问
-            switch ($e->getCode()) {
-                case 0:
-                    return Response::pluginServerError();
-                    break;
-                default:
-                    return Response::error([
-                        'message' => $e->getMessage()
-                    ]);
-                    break;
-            }
-        } catch (GuzzleException $e) {
-        }
-
-    }
-
-    function event()
+    public function event()
     {
 
         if (!$this->isHMAC()) {
