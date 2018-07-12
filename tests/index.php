@@ -14,10 +14,11 @@ require_once __DIR__ . '/../vendor/autoload.php';
 error_reporting(E_ALL);
 
 $CoolQ = new  CoolQ('127.0.0.1:5700', 'kilingzhang', 'kilingzhang',false);
+
 //$CoolQ->setReturnFormat('array');
 //194233857
 //1353693508
 //echo $CoolQ->sendPrivateMsg(1353693508, 194233857, false, true);
 
 
-echo $CoolQ->sendPrivateMsg(1353693508, 'Ni Mei De!', false, true);
+echo $CoolQ->sendPrivateMsg(1353693508, 'Ni Mei De! SB', false, true);

@@ -6,8 +6,8 @@
  * Time: 下午2:32
  */
 
+namespace CoolQSDK\Tests;
 
-use CoolQSDK\Tests\CoolQ;
 
 include __DIR__ . '/../vendor/autoload.php';
 

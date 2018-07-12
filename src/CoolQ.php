@@ -28,7 +28,6 @@
 
 namespace CoolQSDK;
 
-use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -229,6 +228,9 @@ abstract class CoolQ
             file_put_contents('./send_private_msg.json',json_encode($this->putParams,JSON_UNESCAPED_UNICODE));
         }
         $this->putParams = json_decode(file_get_contents('./send_private_msg.json'),true);
+        if(empty($this->putParams)){
+            return Response::eventMissParamsError();
+        }
         return $this->putParams;
     }
 
@@ -300,6 +302,7 @@ abstract class CoolQ
 
     public function event()
     {
+
 
         if (!$this->isHMAC()) {
             return Response::signatureError();
@@ -477,8 +480,7 @@ abstract class CoolQ
 
                 break;
         }
-        var_dump($this->postType,$this->content,$this->getPutParams());
-        exit();
+
        return $this->sendPrivateMsg(1353693508, 'Ni Mei De And Ni Ma Bi!', false, true);
 
     }
