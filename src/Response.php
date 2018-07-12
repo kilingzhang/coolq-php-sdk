@@ -15,7 +15,7 @@ class Response
     {
         $respose = null;
         switch (CoolQ::getReturnFormat()) {
-            case "string":
+            case "json":
                 $respose = \GuzzleHttp\json_encode([
                     'retcode' => $code,
                     'status' => $status,
@@ -52,6 +52,10 @@ class Response
         return self::respose([], 403, self::getMessage(403), 'failed');
     }
 
+    public static function signatureError()
+    {
+        return self::respose([], 403, self::getMessage(403), 'failed');
+    }
 
     public static function accessTokenNoneError()
     {
@@ -68,9 +72,14 @@ class Response
         return self::respose([], 406, self::getMessage(406), 'failed');
     }
 
-    public static function pluginServerError()
+    public static function pluginServerError($data = [])
     {
-        return self::respose([], -2333, self::getMessage(-2333), 'failed');
+        return self::respose($data, -2333, self::getMessage(-2333), 'failed');
+    }
+
+    public static function eventMissParamsError($data = [])
+    {
+        return self::respose($data, -2333, self::getMessage(65535), 'failed');
     }
 
     public static function error($data = [])
@@ -151,10 +160,11 @@ class Response
             201 => '工作线程池未正确初始化（无法执行异步任务）',
             400 => ' POST 请求的正文格式不正确',
             401 => 'access token 未提供',
-            403 => 'access token 不符合',
+            403 => 'access token 或 HTTP_X_SIGNATURE 不符合',
             404 => 'API 不存在',
             406 => 'POST 请求的 Content-Type 不支持',
             500 => '未知错误',
+            65535 => '未获取到上报事件发送的上报数据',
         ];
 
         if (!array_key_exists($retcode, $message)) {
