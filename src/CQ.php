@@ -85,6 +85,11 @@ class CQ
         return "[CQ:share,url=$url,title=$title,content=$content,image=$image] ";
     }
 
+    public static function rich($url, $text)
+    {
+        return "[CQ:rich,url=$url,text=$text] ";
+    }
+
     public static function filterCQAt($string)
     {
         return preg_replace('/\[CQ:at,qq=\d+\]/', '', $string);

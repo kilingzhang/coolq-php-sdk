@@ -136,6 +136,7 @@ abstract class CoolQ
 
     public abstract function afterCurl($uri = '', $param = [], $response, $errorException);
 
+
     /**
      * @return string
      */
@@ -221,14 +222,14 @@ abstract class CoolQ
      */
     public function getPutParams(): array
     {
-        if(empty($this->putParams)){
+        if (empty($this->putParams)) {
             $this->putParams = $this->put();
         }
-        if(!empty($this->putParams)){
-            file_put_contents('./send_private_msg.json',json_encode($this->putParams,JSON_UNESCAPED_UNICODE));
+        if (!empty($this->putParams)) {
+            file_put_contents('./send_private_msg.json', json_encode($this->putParams, JSON_UNESCAPED_UNICODE));
         }
-        $this->putParams = json_decode(file_get_contents('./send_private_msg.json'),true);
-        if(empty($this->putParams)){
+        $this->putParams = json_decode(file_get_contents('./send_private_msg.json'), true);
+        if (empty($this->putParams)) {
             return Response::eventMissParamsError();
         }
         return $this->putParams;
@@ -262,6 +263,23 @@ abstract class CoolQ
         if (in_array($returnFormat, $formats)) {
             self::$returnFormat = $returnFormat;
         }
+    }
+
+
+    public function returnJsonApi($response)
+    {
+        switch (CoolQ::getReturnFormat()) {
+            case "json":
+                break;
+            case "array":
+                $response = json_encode($response, JSON_UNESCAPED_UNICODE);
+                break;
+            default:
+                $response = 'Not Found Format';
+                break;
+        }
+        echo $response;
+        exit();
     }
 
     private function put(bool $isJson = false)
@@ -304,9 +322,10 @@ abstract class CoolQ
     {
 
 
-        if (!$this->isHMAC()) {
-            return Response::signatureError();
-        }
+        $isHMAC = $this->isHMAC();
+
+        $this->onSignature($isHMAC);
+
         $content = $this->getPutParams();
 
         if (empty($content)) {
@@ -370,6 +389,7 @@ abstract class CoolQ
                         // {"reply":"message","block": true,"at_sender":true}
                         break;
                 }
+                $this->onMessage($this->content);
                 break;
             //群、讨论组变动等非消息类事件
             case 'notice': //兼容4.0
@@ -442,6 +462,8 @@ abstract class CoolQ
 
                         break;
                 }
+                $this->onEvent($this->content);
+                $this->onNotice($this->content);
                 break;
             //加好友请求、加群请求／邀请
             case 'request':
@@ -473,17 +495,28 @@ abstract class CoolQ
                         //{"block": true,"approve":true,"reason":"就是拒绝你 不行啊"}
                         break;
                 }
+                $this->onRequest($this->content);
                 break;
             default:
-
                 $this->content = $content;
-
+                $this->onOther($this->content);
                 break;
         }
 
-       return $this->sendPrivateMsg(1353693508, 'Ni Mei De And Ni Ma Bi!', false, true);
-
     }
+
+    public abstract function onSignature($isHMAC);
+
+    public abstract function onMessage($content);
+
+    public abstract function onEvent($content);
+
+    public abstract function onNotice($content);
+
+    public abstract function onRequest($content);
+
+    public abstract function onOther($content);
+
 
     public function sendPrivateMsg(int $user_id, string $message, bool $auto_escape = false, bool $async = null)
     {
