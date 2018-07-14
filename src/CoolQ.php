@@ -78,7 +78,7 @@ abstract class CoolQ
      */
     private $pushParams = '';
 
-    private $response;
+    private $response = null;
 
     /**
      *
