@@ -78,6 +78,8 @@ abstract class CoolQ
      */
     private $pushParams = '';
 
+    private $response;
+
     /**
      *
      * @var \GuzzleHttp\Client 或 \swoole_http_client
@@ -1027,9 +1029,11 @@ abstract class CoolQ
 
         try {
 
-            $response = self::getClient()->request($method, $uri, array_merge(self::$options, [
+            $this->response = self::getClient()->request($method, $uri, array_merge(self::$options, [
                 'query' => $param
             ]));
+
+            $response = $this->response;
 
             //curl after do
             $this->afterCurl($uri, $param, $response, null);
@@ -1040,7 +1044,7 @@ abstract class CoolQ
             }
 
         } catch (ClientException $e) {
-            $this->afterCurl($uri, $param, $response, $e);
+            $this->afterCurl($uri, $param, $this->response, $e);
             //如果 http_errors 请求参数设置成true，在400级别的错误的时候将会抛出
             switch ($e->getCode()) {
                 case 400:
@@ -1067,7 +1071,7 @@ abstract class CoolQ
                     break;
             }
         } catch (RequestException $e) {
-            $this->afterCurl($uri, $param, $response, $e);
+            $this->afterCurl($uri, $param, $this->response, $e);
             //在发送网络错误(连接超时、DNS错误等)时，将会抛出 GuzzleHttp\Exception\RequestException 异常。
             //一般为coolq-http-api插件未开启 接口地址无法访问
             switch ($e->getCode()) {
@@ -1081,7 +1085,7 @@ abstract class CoolQ
                     break;
             }
         } catch (GuzzleException $e) {
-            $this->afterCurl($uri, $param, $response, $e);
+            $this->afterCurl($uri, $param, $this->response, $e);
         }
 
     }
