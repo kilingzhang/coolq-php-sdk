@@ -136,6 +136,10 @@ abstract class CoolQ
 
     public abstract function afterCurl($uri = '', $param = [], $response, $errorException);
 
+    public abstract function beforEvent();
+
+    public abstract function afterEvent();
+
 
     /**
      * @return string
@@ -265,6 +269,37 @@ abstract class CoolQ
         }
     }
 
+    /**
+     * @return string
+     */
+    public function getPostType(): string
+    {
+        return $this->postType;
+    }
+
+    /**
+     * @param string $postType
+     */
+    public function setPostType(string $postType)
+    {
+        $this->postType = $postType;
+    }
+
+    /**
+     * @return array
+     */
+    public function getContent(): array
+    {
+        return $this->content;
+    }
+
+    /**
+     * @param array $content
+     */
+    public function setContent(array $content)
+    {
+        $this->content = $content;
+    }
 
     public function returnJsonApi($response)
     {
@@ -321,6 +356,7 @@ abstract class CoolQ
     public function event()
     {
 
+        $this->beforEvent();
 
         $isHMAC = $this->isHMAC();
 
@@ -502,6 +538,8 @@ abstract class CoolQ
                 $this->onOther($this->content);
                 break;
         }
+
+        $this->afterEvent();
 
     }
 
