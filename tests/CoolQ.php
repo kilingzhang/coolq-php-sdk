@@ -61,4 +61,12 @@ class CoolQ extends \CoolQSDK\CoolQ
         $response = $this->sendPrivateMsg(1353693508, json_encode($content, JSON_UNESCAPED_UNICODE), false, true);
         $this->returnJsonApi($response);
     }
+
+    public function beforEvent()
+    {
+    }
+
+    public function afterEvent()
+    {
+    }
 }

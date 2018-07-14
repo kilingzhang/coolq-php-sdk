@@ -11,8 +11,10 @@ namespace CoolQSDK\Tests;
 
 include __DIR__ . '/../vendor/autoload.php';
 
-$CoolQ = new  CoolQ('127.0.0.1:5700', 'kilingzhang', 'kilingzhang');
-
+//http
+$CoolQ = new  CoolQ('127.0.0.1:5700', 'kilingzhang', 'kilingzhang',false);
+//websocket
+//$CoolQ = new  CoolQ('127.0.0.1:6700', 'kilingzhang', 'kilingzhang',true);
+//$CoolQ->setIsAsync(true);
 //$CoolQ->setReturnFormat('array');
-
-echo $CoolQ->event();
+$CoolQ->event();

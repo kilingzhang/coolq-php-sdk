@@ -41,27 +41,27 @@ abstract class CoolQ
      * 127.0.0.1:5700
      * @var string
      */
-    private $host;
+    private static $host;
     /**
      * API 访问 token，如果不为空，则会在接收到请求时验证 Authorization 请求头是否为 Token
      * @var string
      */
-    private $token;
+    private static $token;
     /**
      * 上报数据签名密钥，如果不为空，则会在 HTTP 上报时对 HTTP 正文进行 HMAC SHA1 哈希，使用 secret 的值作为密钥，计算出的哈希值放在上报的 X-Signature 请求头，例如 X-Signature:
      * @var string
      */
-    private $secret = '';
+    private static $secret = '';
     /**
      * 是否开启验证X-Signature 请求头 (强烈建议开启)
      * @var bool
      */
-    private $isSignature = true;
     /**
      * 是否使用 websocket
      * @var bool
      */
-    private $useWs = false;
+    private static $useWs = false;
+    private $isSignature = true;
     /**
      * 是否全局开始异步事件(当开启此设置时，全局无论是否使用异步函数均为异步处理)
      * @var bool
@@ -77,11 +77,15 @@ abstract class CoolQ
      * @var array
      */
     private $pushParams = '';
+
     /**
      *
      * @var \GuzzleHttp\Client 或 \swoole_http_client
      */
-    private static $client;
+    private static $clientInstance;
+    private static $eventClientInstance;
+    private static $isContentEvent = false;
+    private static $eventPutParams;
     /**
      * http 请求头参数
      * @var
@@ -93,43 +97,41 @@ abstract class CoolQ
      */
     private static $returnFormat = 'json';
 
-    private $postType = '';
 
+    private $postType = '';
     private $content = array();
+
 
     public function __construct($host = '127.0.0.1:5700', $token = '', $secret = '', $useWs = false)
     {
 
         if (substr(PHP_VERSION, 0, 1) != "7") die("PHP >=7 required.");
+        if ($useWs && !extension_loaded("swoole")) die("无法找到swoole扩展，请先安装.");
 
-        $this->host = $host;
-        $this->useWs = $useWs;
-        $this->token = $token;
-        $this->secret = $secret;
-        if ($useWs == false) {
-            self::$options['headers'] = [
-                'Authorization' => 'Token ' . $this->token
-            ];
-            self::$client = new Client([
-                // Base URI is used with relative requests
-                'base_uri' => $this->host,
-                // You can set any number of default request options.
-                'timeout' => 10.0,
-            ]);
-        } else {
+        self::$host = $host;
+        self::$useWs = $useWs;
+        self::$token = $token;
+        self::$secret = $secret;
+        self::$clientInstance = self::getClient();
 
-            if (!extension_loaded("swoole")) die("无法找到swoole扩展，请先安装.");
-            $host = explode(':', $this->host);
+        if ($this->isUseWs()) {
 
-            self::$client = new \swoole_http_client($host[0], $host[1]);
-            self::$client->setHeaders([
-                'Authorization' => 'Token ' . $this->token
-            ]);
-            self::$client->set(['websocket_mask' => true]);
+            self::$clientInstance->on('message', function ($_cli, $frame) {
+                $pushParams = $this->getPushParams();
+                $this->afterCurl('/' . $pushParams['action'], $pushParams['params'], $_cli, null);
+            });
+            self::$clientInstance->upgrade('/api/', function ($cli) {
+                self::$clientInstance = $cli;
+            });
+
+
+            self::$eventClientInstance = self::getEventClientInstance();
+            self::$eventClientInstance->on('message', function ($cli, $frame) {
+                self::$eventPutParams = $frame->data;
+                $this->event();
+            });
 
         }
-
-
     }
 
     public abstract function beforeCurl($uri = '', $param = []);
@@ -146,7 +148,7 @@ abstract class CoolQ
      */
     public function getHost(): string
     {
-        return $this->host;
+        return self::$host;
     }
 
     /**
@@ -154,16 +156,53 @@ abstract class CoolQ
      */
     public function isUseWs(): bool
     {
-        return $this->useWs;
+        return self::$useWs;
     }
 
     /**
      * @return Client
      */
-    public static function getClient(): Client
+    public static function getClient()
     {
-        return self::$client;
+        if (self::$clientInstance == null) {
+            if (self::$useWs == false) {
+                self::$options['headers'] = [
+                    'Authorization' => 'Token ' . self::$token
+                ];
+                self::$clientInstance = new Client([
+                    // Base URI is used with relative requests
+                    'base_uri' => self::$host,
+                    // You can set any number of default request options.
+                    'timeout' => 10.0,
+                ]);
+            } else {
+                $host = explode(':', self::$host);
+                self::$clientInstance = new \swoole_http_client($host[0], $host[1]);
+                self::$clientInstance->setHeaders([
+                    'Authorization' => 'Token ' . self::$token
+                ]);
+                self::$clientInstance->set(['websocket_mask' => true]);
+
+            }
+        }
+        return self::$clientInstance;
     }
+
+    public static function getEventClientInstance()
+    {
+        if (self::$eventClientInstance == null) {
+            $host = explode(':', self::$host);
+            self::$eventClientInstance = new \swoole_http_client($host[0], $host[1]);
+
+            self::$eventClientInstance->setHeaders([
+                'Authorization' => 'Token ' . self::$token
+            ]);
+            self::$eventClientInstance->set(['websocket_mask' => true]);
+
+        }
+        return self::$eventClientInstance;
+    }
+
 
     /**
      * @return mixed
@@ -178,7 +217,7 @@ abstract class CoolQ
      */
     public function getToken(): string
     {
-        return $this->token;
+        return self::$token;
     }
 
     /**
@@ -186,7 +225,7 @@ abstract class CoolQ
      */
     public function getSecret(): string
     {
-        return $this->secret;
+        return self::$secret;
     }
 
     /**
@@ -221,14 +260,23 @@ abstract class CoolQ
         $this->isAsync = $isAsync;
     }
 
+    public function setPutParams($putParams)
+    {
+        $this->putParams = $putParams;
+    }
+
     /**
      * @return array
      */
     public function getPutParams(): array
     {
-        if (empty($this->putParams)) {
+
+        if ($this->isUseWs()) {
+            $this->putParams = json_decode(self::$eventPutParams, true);
+        } else {
             $this->putParams = $this->put();
         }
+
         if (!empty($this->putParams)) {
             file_put_contents('./send_private_msg.json', json_encode($this->putParams, JSON_UNESCAPED_UNICODE));
         }
@@ -314,7 +362,10 @@ abstract class CoolQ
                 break;
         }
         echo $response;
-        exit();
+        //websocket 禁止退出
+        if (!$this->isUseWs()) {
+            exit();
+        }
     }
 
     private function put(bool $isJson = false)
@@ -355,6 +406,13 @@ abstract class CoolQ
 
     public function event()
     {
+
+        if (!self::$isContentEvent && $this->isUseWs()) {
+            self::$eventClientInstance->upgrade('/event/', function ($cli) {
+                self::$isContentEvent = true;
+            });
+            return;
+        }
 
         $this->beforEvent();
 
@@ -943,43 +1001,33 @@ abstract class CoolQ
         return $this->curl($uri, $param);
     }
 
+
     private function curlWs($uri = Url::get_version_info, $param = [], $method = 'GET')
     {
+
         //$uri: /send_private_msg -> action: send_private_msg
         $pushParams['action'] = substr($uri, 1);
         $pushParams['params'] = $param;
         $pushParams = json_encode($pushParams, JSON_UNESCAPED_UNICODE);
         $this->pushParams = $pushParams;
 
-        //curl before d/o
-        $this->beforeCurl($uri, $param);
-
-        self::$client->on('message', function ($cli, $frame) {
-            echo $frame->data;
-        });
-
-        self::$client->upgrade('/api/', function ($cli) {
-
-            $cli->push($this->pushParams);
-            $pushParams = json_decode($this->pushParams, true);
-            $this->afterCurl('/' . $pushParams['action'], $pushParams['params'], $cli, null);
-
-        });
-        return true;
+        $cli = self::getClient();
+        $cli->push($this->pushParams);
+        return;
     }
 
     private function curl($uri = Url::get_version_info, $param = [], $method = 'GET')
     {
-        if ($this->useWs == true) {
+        //curl before d/o
+        $this->beforeCurl($uri, $param);
+
+        if ($this->isUseWs() == true) {
             return $this->curlWs($uri, $param, $method);
         }
 
         try {
 
-            //curl before do
-            $this->beforeCurl($uri, $param);
-
-            $response = self::$client->request($method, $uri, array_merge(self::$options, [
+            $response = self::getClient()->request($method, $uri, array_merge(self::$options, [
                 'query' => $param
             ]));
 
@@ -1024,7 +1072,7 @@ abstract class CoolQ
             //一般为coolq-http-api插件未开启 接口地址无法访问
             switch ($e->getCode()) {
                 case 0:
-                    return Response::pluginServerError(self::$client);
+                    return Response::pluginServerError(self::getClient());
                     break;
                 default:
                     return Response::error([
