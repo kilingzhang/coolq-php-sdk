@@ -234,7 +234,7 @@ abstract class CoolQ
         }
         $this->putParams = json_decode(file_get_contents('./send_private_msg.json'), true);
         if (empty($this->putParams)) {
-            return Response::eventMissParamsError();
+            $this->returnJsonApi(Response::eventMissParamsError());
         }
         return $this->putParams;
     }
@@ -242,7 +242,7 @@ abstract class CoolQ
     /**
      * @return array
      */
-    public function getPusParams(): array
+    public function getPushParams(): array
     {
         return json_decode($this->pushParams, true);
     }
@@ -365,7 +365,7 @@ abstract class CoolQ
         $content = $this->getPutParams();
 
         if (empty($content)) {
-            return Response::eventMissParamsError();
+            $this->returnJsonApi(Response::eventMissParamsError());
         }
 
         $this->postType = $content['post_type'];
