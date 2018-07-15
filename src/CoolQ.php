@@ -806,7 +806,7 @@ abstract class CoolQ
             return Response::banAccountError();
         }
 
-        if ($this->isBlackList() && in_array($user_id, $this->getPrivateWhiteList())) {
+        if (!$this->isWhiteList() && $this->isBlackList() && in_array($user_id, $this->getPrivateBlackList())) {
             return Response::banAccountError();
         }
 
@@ -830,7 +830,7 @@ abstract class CoolQ
             return Response::banAccountError();
         }
 
-        if ($this->isBlackList() && in_array($user_id, $this->getPrivateWhiteList())) {
+        if (!$this->isWhiteList() && $this->isBlackList() && in_array($user_id, $this->getPrivateBlackList())) {
             return Response::banAccountError();
         }
 
@@ -850,7 +850,7 @@ abstract class CoolQ
             return Response::banAccountError();
         }
 
-        if ($this->isBlackList() && in_array($group_id, $this->getGroupBlackList())) {
+        if (!$this->isWhiteList() && $this->isBlackList() && in_array($group_id, $this->getGroupBlackList())) {
             return Response::banAccountError();
         }
 
@@ -874,7 +874,7 @@ abstract class CoolQ
             return Response::banAccountError();
         }
 
-        if ($this->isBlackList() && in_array($group_id, $this->getGroupBlackList())) {
+        if (!$this->isWhiteList() && $this->isBlackList() && in_array($group_id, $this->getGroupBlackList())) {
             return Response::banAccountError();
         }
 
@@ -894,7 +894,7 @@ abstract class CoolQ
             return Response::banAccountError();
         }
 
-        if ($this->isBlackList() && in_array($discuss_id, $this->getDiscussBlackList())) {
+        if (!$this->isWhiteList() && $this->isBlackList() && in_array($discuss_id, $this->getDiscussBlackList())) {
             return Response::banAccountError();
         }
 
