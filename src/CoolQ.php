@@ -108,6 +108,45 @@ abstract class CoolQ
      * @var string
      */
     private static $returnFormat = 'json';
+    /**
+     * @var bool
+     */
+    private $isWhiteList = true;
+    /**
+     * @var bool
+     */
+    private $isBlackList = false;
+    /**
+     * 白名单优先级高于黑名单 当开启白名单时，黑名单将失效
+     * 私聊白名单
+     * @var array
+     */
+    private $privateWhiteList = [];
+    /**
+     * 私聊黑名单
+     * @var array
+     */
+    private $privateBlackList = [];
+    /**
+     * 群组白名单
+     * @var array
+     */
+    private $groupWhiteList = [];
+    /**
+     * 群组黑名单
+     * @var array
+     */
+    private $groupBlackList = [];
+    /**
+     * 讨论组白名单
+     * @var array
+     */
+    private $discussWhiteList = [];
+    /**
+     * 讨论组黑名单
+     * @var array
+     */
+    private $discussBlackList = [];
 
 
     private $postType = '';
@@ -214,7 +253,6 @@ abstract class CoolQ
         }
         return self::$eventClientInstance;
     }
-
 
     /**
      * @return mixed
@@ -365,6 +403,138 @@ abstract class CoolQ
         $this->content = $content;
     }
 
+    /**
+     * @return bool
+     */
+    public function isWhiteList(): bool
+    {
+        return $this->isWhiteList;
+    }
+
+    /**
+     * @param bool $isWhiteList
+     */
+    public function setIsWhiteList(bool $isWhiteList)
+    {
+        $this->isWhiteList = $isWhiteList;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBlackList(): bool
+    {
+        return $this->isBlackList;
+    }
+
+    /**
+     * @param bool $isBlackList
+     */
+    public function setIsBlackList(bool $isBlackList)
+    {
+        $this->isBlackList = $isBlackList;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPrivateWhiteList(): array
+    {
+        return $this->privateWhiteList;
+    }
+
+    /**
+     * @param array $privateWhiteList
+     */
+    public function setPrivateWhiteList(array $privateWhiteList)
+    {
+        $this->privateWhiteList = $privateWhiteList;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPrivateBlackList(): array
+    {
+        return $this->privateBlackList;
+    }
+
+    /**
+     * @param array $privateBlackList
+     */
+    public function setPrivateBlackList(array $privateBlackList)
+    {
+        $this->privateBlackList = $privateBlackList;
+    }
+
+    /**
+     * @return array
+     */
+    public function getGroupWhiteList(): array
+    {
+        return $this->groupWhiteList;
+    }
+
+    /**
+     * @param array $groupWhiteList
+     */
+    public function setGroupWhiteList(array $groupWhiteList)
+    {
+        $this->groupWhiteList = $groupWhiteList;
+    }
+
+    /**
+     * @return array
+     */
+    public function getGroupBlackList(): array
+    {
+        return $this->groupBlackList;
+    }
+
+    /**
+     * @param array $groupBlackList
+     */
+    public function setGroupBlackList(array $groupBlackList)
+    {
+        $this->groupBlackList = $groupBlackList;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDiscussWhiteList(): array
+    {
+        return $this->discussWhiteList;
+    }
+
+    /**
+     * @param array $discussWhiteList
+     */
+    public function setDiscussWhiteList(array $discussWhiteList)
+    {
+        $this->discussWhiteList = $discussWhiteList;
+    }
+
+    /**
+     * @return array
+     */
+    public function getDiscussBlackList(): array
+    {
+        return $this->discussBlackList;
+    }
+
+    /**
+     * @param array $discussBlackList
+     */
+    public function setDiscussBlackList(array $discussBlackList)
+    {
+        $this->discussBlackList = $discussBlackList;
+    }
+
+    /**
+     *
+     * @param $response
+     */
     public function returnJsonApi($response)
     {
         switch (CoolQ::getReturnFormat()) {
@@ -632,6 +802,14 @@ abstract class CoolQ
 
     public function sendPrivateMsg(int $user_id, string $message, bool $auto_escape = false, bool $async = null)
     {
+        if ($this->isWhiteList() && !in_array($user_id, $this->getPrivateWhiteList())) {
+            return Response::banAccountError();
+        }
+
+        if ($this->isBlackList() && in_array($user_id, $this->getPrivateWhiteList())) {
+            return Response::banAccountError();
+        }
+
         if ((is_null($async) && $this->isAsync) || $async === true) {
             return $this->sendPrivateMsgAsync($user_id, $message, $auto_escape);
         }
@@ -648,6 +826,14 @@ abstract class CoolQ
 
     public function sendPrivateMsgAsync(int $user_id, string $message, bool $auto_escape = false)
     {
+        if ($this->isWhiteList() && !in_array($user_id, $this->getPrivateWhiteList())) {
+            return Response::banAccountError();
+        }
+
+        if ($this->isBlackList() && in_array($user_id, $this->getPrivateWhiteList())) {
+            return Response::banAccountError();
+        }
+
         $uri = Url::send_private_msg_async;
         $param = [
             'user_id' => $user_id,
@@ -660,6 +846,14 @@ abstract class CoolQ
 
     public function sendGroupMsg(int $group_id, string $message, bool $auto_escape = false, bool $async = null)
     {
+        if ($this->isWhiteList() && !in_array($group_id, $this->getGroupWhiteList())) {
+            return Response::banAccountError();
+        }
+
+        if ($this->isBlackList() && in_array($group_id, $this->getGroupBlackList())) {
+            return Response::banAccountError();
+        }
+
         if ((is_null($async) && $this->isAsync) || $async === true) {
             return $this->sendGroupMsgAsync($group_id, $message, $auto_escape);
         }
@@ -676,6 +870,14 @@ abstract class CoolQ
 
     public function sendGroupMsgAsync(int $group_id, string $message, bool $auto_escape = false)
     {
+        if ($this->isWhiteList() && !in_array($group_id, $this->getGroupWhiteList())) {
+            return Response::banAccountError();
+        }
+
+        if ($this->isBlackList() && in_array($group_id, $this->getGroupBlackList())) {
+            return Response::banAccountError();
+        }
+
         $uri = Url::send_group_msg_async;
         $param = [
             'group_id' => $group_id,
@@ -688,6 +890,14 @@ abstract class CoolQ
 
     public function sendDiscussMsg(int $discuss_id, string $message, bool $auto_escape = false, bool $async = null)
     {
+        if ($this->isWhiteList() && !in_array($discuss_id, $this->getDiscussWhiteList())) {
+            return Response::banAccountError();
+        }
+
+        if ($this->isBlackList() && in_array($discuss_id, $this->getDiscussBlackList())) {
+            return Response::banAccountError();
+        }
+
         if ((is_null($async) && $this->isAsync) || $async === true) {
             return $this->sendDiscussMsgAsync($discuss_id, $message, $auto_escape);
         }
@@ -704,6 +914,14 @@ abstract class CoolQ
 
     public function sendDiscussMsgAsync(int $discuss_id, string $message, bool $auto_escape = false)
     {
+        if ($this->isWhiteList() && !in_array($discuss_id, $this->getDiscussWhiteList())) {
+            return Response::banAccountError();
+        }
+
+        if ($this->isBlackList() && in_array($discuss_id, $this->getDiscussBlackList())) {
+            return Response::banAccountError();
+        }
+
         $uri = Url::send_discuss_msg_async;
         $param = [
             'discuss_id' => $discuss_id,
@@ -716,6 +934,38 @@ abstract class CoolQ
 
     public function sendMsg(string $message_type, int $id, string $message, bool $auto_escape = false, bool $async = null)
     {
+        switch ($message_type) {
+            case 'private':
+                if ($this->isWhiteList() && !in_array($id, $this->getPrivateWhiteList())) {
+                    return Response::banAccountError();
+                }
+
+                if ($this->isBlackList() && in_array($id, $this->getPrivateBlackList())) {
+                    return Response::banAccountError();
+                }
+                break;
+            case 'group':
+                if ($this->isWhiteList() && !in_array($id, $this->getGroupWhiteList())) {
+                    return Response::banAccountError();
+                }
+
+                if ($this->isBlackList() && in_array($id, $this->getGroupBlackList())) {
+                    return Response::banAccountError();
+                }
+                break;
+            case 'discuss':
+                if ($this->isWhiteList() && !in_array($id, $this->getDiscussWhiteList())) {
+                    return Response::banAccountError();
+                }
+
+                if ($this->isBlackList() && in_array($id, $this->getDiscussBlackList())) {
+                    return Response::banAccountError();
+                }
+                break;
+            default:
+                break;
+        }
+
         if ((is_null($async) && $this->isAsync) || $async === true) {
             return $this->sendMsgAsync($message_type, $id, $message, $auto_escape);
         }
@@ -735,6 +985,38 @@ abstract class CoolQ
 
     public function sendMsgAsync(string $message_type, int $id, string $message, bool $auto_escape = false)
     {
+        switch ($message_type) {
+            case 'private':
+                if ($this->isWhiteList() && !in_array($id, $this->getPrivateWhiteList())) {
+                    return Response::banAccountError();
+                }
+
+                if ($this->isBlackList() && in_array($id, $this->getPrivateBlackList())) {
+                    return Response::banAccountError();
+                }
+                break;
+            case 'group':
+                if ($this->isWhiteList() && !in_array($id, $this->getGroupWhiteList())) {
+                    return Response::banAccountError();
+                }
+
+                if ($this->isBlackList() && in_array($id, $this->getGroupBlackList())) {
+                    return Response::banAccountError();
+                }
+                break;
+            case 'discuss':
+                if ($this->isWhiteList() && !in_array($id, $this->getDiscussWhiteList())) {
+                    return Response::banAccountError();
+                }
+
+                if ($this->isBlackList() && in_array($id, $this->getDiscussBlackList())) {
+                    return Response::banAccountError();
+                }
+                break;
+            default:
+                break;
+        }
+
         $uri = Url::send_msg;
         $param = [
             'message_type' => $message_type,

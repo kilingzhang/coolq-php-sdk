@@ -67,6 +67,11 @@ class Response
         return self::respose([], 404, self::getMessage(404), 'failed');
     }
 
+    public static function banAccountError($data = [])
+    {
+        return self::respose($data, 405 , self::getMessage(405), 'failed');
+    }
+
     public static function contentTypeError()
     {
         return self::respose([], 406, self::getMessage(406), 'failed');
@@ -79,8 +84,10 @@ class Response
 
     public static function eventMissParamsError($data = [])
     {
-        return self::respose($data, -2333, self::getMessage(65535), 'failed');
+        return self::respose($data, 65535, self::getMessage(65535), 'failed');
     }
+
+
 
     public static function error($data = [])
     {
@@ -162,6 +169,7 @@ class Response
             401 => 'access token 未提供',
             403 => 'access token 或 HTTP_X_SIGNATURE 不符合',
             404 => 'API 不存在',
+            405 => '该账号id已被禁止，无法对其进行操作',
             406 => 'POST 请求的 Content-Type 不支持',
             500 => '未知错误',
             65535 => '未获取到上报事件发送的上报数据',
