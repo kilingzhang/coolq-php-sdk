@@ -111,11 +111,11 @@ abstract class CoolQ
     /**
      * @var bool
      */
-    private $isWhiteList = true;
+    private $isWhiteList = false;
     /**
      * @var bool
      */
-    private $isBlackList = false;
+    private $isBlackList = true;
     /**
      * 白名单优先级高于黑名单 当开启白名单时，黑名单将失效
      * 私聊白名单
