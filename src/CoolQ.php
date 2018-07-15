@@ -77,16 +77,26 @@ abstract class CoolQ
      * @var array
      */
     private $pushParams = '';
-
+    /**
+     * @var null
+     */
     private $response = null;
-
     /**
      *
      * @var \GuzzleHttp\Client 或 \swoole_http_client
      */
     private static $clientInstance;
+    /**
+     * @var \swoole_http_client
+     */
     private static $eventClientInstance;
+    /**
+     * @var bool
+     */
     private static $isContentEvent = false;
+    /**
+     * @var
+     */
     private static $eventPutParams;
     /**
      * http 请求头参数
@@ -118,6 +128,8 @@ abstract class CoolQ
 
         if ($this->isUseWs()) {
 
+            self::$eventClientInstance = self::getEventClientInstance();
+
             self::$clientInstance->on('message', function ($_cli, $frame) {
                 $pushParams = $this->getPushParams();
                 $this->afterCurl('/' . $pushParams['action'], $pushParams['params'], $_cli, null);
@@ -126,8 +138,6 @@ abstract class CoolQ
                 self::$clientInstance = $cli;
             });
 
-
-            self::$eventClientInstance = self::getEventClientInstance();
             self::$eventClientInstance->on('message', function ($cli, $frame) {
                 self::$eventPutParams = $frame->data;
                 $this->event();
@@ -279,10 +289,14 @@ abstract class CoolQ
             $this->putParams = $this->put();
         }
 
-        if (!empty($this->putParams)) {
+        if (!$this->isUseWs() && !empty($this->putParams)) {
             file_put_contents('./send_private_msg.json', json_encode($this->putParams, JSON_UNESCAPED_UNICODE));
         }
-        $this->putParams = json_decode(file_get_contents('./send_private_msg.json'), true);
+
+        if (!$this->isUseWs() && file_exists('./send_private_msg.json')) {
+            $this->putParams = json_decode(file_get_contents('./send_private_msg.json'), true);
+        }
+
         if (empty($this->putParams)) {
             $this->returnJsonApi(Response::eventMissParamsError());
         }
