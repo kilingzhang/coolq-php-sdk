@@ -14,7 +14,7 @@ include __DIR__ . '/../vendor/autoload.php';
 //http
 //$CoolQ = new  CoolQ('127.0.0.1:5700', 'kilingzhang', 'kilingzhang',false);
 //websocket
-$CoolQ = new  CoolQ('127.0.0.1:6700', 'kilingzhang', 'kilingzhang',true);
+$CoolQ = new  CoolQ('127.0.0.1:6700', 'kilingzhang', 'kilingzhang',false);
 //$CoolQ->setIsAsync(true);
 //$CoolQ->setReturnFormat('array');
 $CoolQ->event();

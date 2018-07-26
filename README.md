@@ -53,7 +53,7 @@ composer config -g repo.packagist composer https://packagist.phpcomposer.com
 
 use CoolQSDK\CoolQ;
 
-include __DIR__ . '/../vendor/autoload.php';
+include __DIR__ . '/vendor/autoload.php';
 
 $CoolQ = new  CoolQ('127.0.0.1:5700', 'kilingzhang', 'kilingzhang');
 
