@@ -38,7 +38,7 @@ composer config -g repo.packagist composer https://packagist.phpcomposer.com
 
 
 ### 基本使用
-[DEMO](https://github.com/kilingzhang/coolq-php-sdk-test)
+[DEMO](https://github.com/kilingzhang/coolq-sdk-php-test)
 
 假设我们创建文件为 api.php, 且api.php和vendor目录为同一级目录
 ```
