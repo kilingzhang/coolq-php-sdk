@@ -38,10 +38,11 @@ composer config -g repo.packagist composer https://packagist.phpcomposer.com
 
 
 ### 基本使用
+[DEMO](https://github.com/kilingzhang/coolq-php-sdk-test)
 
 假设我们创建文件为 api.php, 且api.php和vendor目录为同一级目录
 ```
-
+->src/CoolQ.php
 ->api.php
 ->vendor/
 
@@ -49,13 +50,17 @@ composer config -g repo.packagist composer https://packagist.phpcomposer.com
 
 #### ```api.php```
 
-```
+```php
 
-use CoolQSDK\CoolQ;
+<?php
 
-include __DIR__ . '/vendor/autoload.php';
 
-$CoolQ = new  CoolQ('127.0.0.1:5700', 'kilingzhang', 'kilingzhang');
+use Kilingzhang\Tests\CoolQ;
+
+include 'vendor/autoload.php';
+
+$CoolQ = new  CoolQ('127.0.0.1:5700', 'token', 'secret', false);
+//$CoolQ = new  CoolQ('127.0.0.1:6700', 'token', 'secret', true);
 
 //$CoolQ->setReturnFormat('array');
 
@@ -63,6 +68,91 @@ $CoolQ->event();
 
 
 ```
+
+
+#### ```src/CoolQ.php```
+
+```php
+
+namespace Kilingzhang\Tests;
+
+
+use CoolQSDK\Response;
+
+class CoolQ extends \CoolQSDK\CoolQ
+{
+
+    public function beforeCurl($uri = '', $param = [])
+    {
+
+    }
+
+    public function afterCurl($uri = '', $param = [], $response, $errorException)
+    {
+
+    }
+
+
+    public function onSignature($isHMAC)
+    {
+        if (!$isHMAC) {
+            $this->returnJsonApi(Response::signatureError());
+        }
+    }
+
+    public function onMessage($content)
+    {
+        $response = $this->sendPrivateMsg(1353693508, json_encode($content, JSON_UNESCAPED_UNICODE), false, true);
+        $this->returnJsonApi($response);
+    }
+
+    public function onEvent($content)
+    {
+        $response = $this->sendPrivateMsg(1353693508, json_encode($content, JSON_UNESCAPED_UNICODE), false, true);
+        $this->returnJsonApi($response);
+    }
+
+    public function onNotice($content)
+    {
+        $response = $this->sendPrivateMsg(1353693508, json_encode($content, JSON_UNESCAPED_UNICODE), false, true);
+        $this->returnJsonApi($response);
+    }
+
+    public function onRequest($content)
+    {
+        $response = $this->sendPrivateMsg(1353693508, json_encode($content, JSON_UNESCAPED_UNICODE), false, true);
+        $this->returnJsonApi($response);
+    }
+
+    public function onOther($content)
+    {
+        $response = $this->sendPrivateMsg(1353693508, json_encode($content, JSON_UNESCAPED_UNICODE), false, true);
+        $this->returnJsonApi($response);
+    }
+
+    public function beforEvent()
+    {
+    }
+
+    public function afterEvent()
+    {
+    }
+}
+
+```
+记得在composer中添加命名空间  否则无法自动加载
+```json
+ {
+     ...
+     "autoload-dev": {
+         "psr-4": {
+             "Kilingzhang\\Tests\\": "src/"
+         }
+     }
+ }
+
+```
+
 
 在对应的 api.php 目录下，输入命令。
 
