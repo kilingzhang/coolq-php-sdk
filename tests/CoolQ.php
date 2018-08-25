@@ -21,8 +21,7 @@ class CoolQ extends \CoolQSDK\CoolQ
 
     public function afterCurl($uri = '', $param = [], $response, $errorException)
     {
-        var_dump($response);
-        var_dump($errorException);
+
     }
 
 

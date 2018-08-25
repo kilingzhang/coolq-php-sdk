@@ -88,6 +88,20 @@ class Response
     }
 
 
+    public static function NotExitsSwoolError($data = [])
+    {
+        return self::respose($data, -1000, self::getMessage(-1000), 'failed');
+    }
+
+    public static function NotBeCliError($data = [])
+    {
+        return self::respose($data, -1001, self::getMessage(-1001), 'failed');
+    }
+
+    public static function NotExitsPcntlError($data = [])
+    {
+        return self::respose($data, -1002, self::getMessage(-1002), 'failed');
+    }
 
     public static function error($data = [])
     {
@@ -99,13 +113,13 @@ class Response
 
         $message = [
             -1 => '请求发送失败=>',
-            -2 => '未收到服务器回复，可能未发送成功=>',
-            -3 => '消息过长或为空=>',
-            -4 => '消息解析过程异常=>',
-            -5 => '日志功能未启用=>',
-            -6 => '日志优先级错误=>',
-            -7 => '数据入库失败=>',
-            -8 => '不支持对系统帐号操作=>',
+            -2 => '未收到服务器回复，可能未发送成功',
+            -3 => '消息过长或为空',
+            -4 => '消息解析过程异常',
+            -5 => '日志功能未启用',
+            -6 => '日志优先级错误',
+            -7 => '数据入库失败',
+            -8 => '不支持对系统帐号操作',
             -9 => '帐号不在该群内，消息无法发送',
             -10 => '该用户不存在/不在群内',
             -11 => '数据错误，无法请求发送',
@@ -158,7 +172,10 @@ class Response
             -202 => 'Api版本过旧或过新',
             -997 => '应用未启用',
             -998 => '应用调用在Auth声明之外的 酷Q A。',
-            -2333 => 'CQHTTP插件未开启，或插件服务器启动失败。访问被拒绝。',
+            -2333 => 'CQHTTP插件未开启，或插件服务器启动失败。访问被拒绝。请检测Docker端口是否开启，网络是否通畅。',
+            -1000 => '无法找到swoole扩展，请先安装.',
+            -1001 => 'must be used in PHP CLI mode.',
+            -1002 => '无法找到Pcntl扩展，请先安装.',
             0 => '同时 status 为 ok，表示操作成功',
             1 => '同时 status 为 async，表示操作已进入异步执行，具体结果未知',
             100 => '参数缺失或参数无效，通常是因为没有传入必要参数，某些接口中也可能因为参数明显无效（比如传入的 QQ 号小于等于 0，此时无需调用酷 Q 函数即可确定失败），此项和以下的 status 均为 failed',

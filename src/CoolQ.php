@@ -157,7 +157,10 @@ abstract class CoolQ
     {
 
         if (substr(PHP_VERSION, 0, 1) != "7") die("PHP >=7 required.");
-        if ($useWs && !extension_loaded("swoole")) die("无法找到swoole扩展，请先安装.");
+        if ($useWs && !extension_loaded("swoole")) {
+            $this->returnJsonApi(Response::NotExitsSwoolError());
+            die();
+        }
 
         self::$host = $host;
         self::$useWs = $useWs;
@@ -166,6 +169,11 @@ abstract class CoolQ
         self::$clientInstance = self::getClient();
 
         if ($this->isUseWs()) {
+
+            if ($useWs && !preg_match("/^cli$/i", php_sapi_name())) {
+                $this->returnJsonApi(Response::NotBeCliError());
+                die();
+            }
 
             self::$eventClientInstance = self::getEventClientInstance();
 
@@ -181,7 +189,6 @@ abstract class CoolQ
                 self::$eventPutParams = $frame->data;
                 $this->event();
             });
-
         }
     }
 
@@ -346,7 +353,7 @@ abstract class CoolQ
      */
     public function getPushParams(): array
     {
-        return json_decode($this->pushParams, true);
+        return json_decode(empty($this->pushParams) ? '[]' : $this->pushParams, true);
     }
 
     /**
@@ -583,7 +590,7 @@ abstract class CoolQ
         $signature = $this->server(['HTTP_X_SIGNATURE']);
         $signature = $signature['HTTP_X_SIGNATURE'] ? substr($signature['HTTP_X_SIGNATURE'], 5, strlen($signature['HTTP_X_SIGNATURE'])) : "";
         $putParams = $this->getPutParams();
-        if ($this->isSignature && !empty($signature) && (hash_hmac('sha1', \GuzzleHttp\json_encode($putParams, JSON_UNESCAPED_UNICODE), $this->secret) != $signature)) {
+        if ($this->isSignature && !empty($signature) && (hash_hmac('sha1', \GuzzleHttp\json_encode($putParams, JSON_UNESCAPED_UNICODE), self::$secret) != $signature)) {
             //sha1验证失败
             return false;
         }
@@ -647,7 +654,7 @@ abstract class CoolQ
                             //匿名用户显示名
                             'anonymous' => $content['anonymous'],
                             //匿名用户 flag，在调用禁言 API 时需要传入
-                            'anonymous_flag' => $content['anonymous_flag'],
+                            'anonymous_flag' => empty($content['anonymous']['flag']) ? '' : $content['anonymous']['flag'],
                         ];
 
                         // {"reply":"message","block": true,"at_sender":true,"kick":false,"ban":false}
@@ -674,13 +681,13 @@ abstract class CoolQ
             //群、讨论组变动等非消息类事件
             case 'notice': //兼容4.0
             case 'event':
-                $event = $content['event'];
+                $event = empty($content['event']) ? $content['notice_type'] : $content['event'];//兼容4.0
                 switch ($event) {
                     //群管理员变动
                     case "group_admin":
 
                         $this->content = [
-                            'event' => $content['event'],
+                            'event' =>  empty($content['event']) ? $content['notice_type'] : $content['event'],
                             //"set"、"unset"	事件子类型，分别表示设置和取消管理员
                             'sub_type' => $content['sub_type'],
                             'group_id' => $content['group_id'],
@@ -692,7 +699,7 @@ abstract class CoolQ
                     case "group_decrease":
 
                         $this->content = [
-                            'event' => $content['event'],
+                            'event' =>  empty($content['event']) ? $content['notice_type'] : $content['event'],
                             //"leave"、"kick"、"kick_me"	事件子类型，分别表示主动退群、成员被踢、登录号被踢
                             'sub_type' => $content['sub_type'],
                             'group_id' => $content['group_id'],
@@ -705,7 +712,7 @@ abstract class CoolQ
                     case "group_increase":
 
                         $this->content = [
-                            'event' => $content['event'],
+                            'event' => empty($content['event']) ? $content['notice_type'] : $content['event'],
                             //"approve"、"invite"	事件子类型，分别表示管理员已同意入群、管理员邀请入群
                             'sub_type' => $content['sub_type'],
                             'group_id' => $content['group_id'],
@@ -720,7 +727,7 @@ abstract class CoolQ
 
 
                         $this->content = [
-                            'event' => $content['event'],
+                            'event' => empty($content['event']) ? $content['notice_type'] : $content['event'],
                             'group_id' => $content['group_id'],
                             'user_id' => $content['user_id'],
                             #字段名	数据类型	说明
@@ -736,14 +743,13 @@ abstract class CoolQ
                     case "friend_added":
 
                         $this->content = [
-                            'event' => $content['event'],
+                            'event' => empty($content['event']) ? $content['notice_type'] : $content['event'],
                             'user_id' => $content['user_id'],
                         ];
 
                         break;
                 }
                 $this->onEvent($this->content);
-                $this->onNotice($this->content);
                 break;
             //加好友请求、加群请求／邀请
             case 'request':
@@ -754,7 +760,7 @@ abstract class CoolQ
                         $this->content = [
                             'request_type' => $content['request_type'],
                             'user_id' => $content['user_id'],
-                            'message' => $content['message'],
+                            'message' => empty($content['message']) ? $content['comment'] : $content['message'],//兼容4.0
                             'flag' => $content['flag'],
                         ];
 
@@ -768,7 +774,7 @@ abstract class CoolQ
                             'sub_type' => $content['sub_type'],
                             'group_id' => $content['group_id'],
                             'user_id' => $content['user_id'],
-                            'message' => $content['message'],
+                            'message' => empty($content['message']) ? $content['comment'] : $content['message'],//兼容4.0
                             'flag' => $content['flag'],
                         ];
 
@@ -792,8 +798,6 @@ abstract class CoolQ
     public abstract function onMessage($content);
 
     public abstract function onEvent($content);
-
-    public abstract function onNotice($content);
 
     public abstract function onRequest($content);
 
