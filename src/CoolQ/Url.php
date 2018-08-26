@@ -6,7 +6,7 @@
  * Time: 下午11:50
  */
 
-namespace CoolQSDK;
+namespace Kilingzhang\QQ\CoolQ;
 
 
 class Url
