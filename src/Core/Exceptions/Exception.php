@@ -6,7 +6,7 @@
  * Time: 23:20
  */
 
-namespace Kilingzhang\QQ\Exceptions;
+namespace Kilingzhang\QQ\Core\Exceptions;
 
 
 class Exception extends \Exception
