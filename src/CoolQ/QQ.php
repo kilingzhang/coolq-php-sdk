@@ -7,12 +7,30 @@
  * Time: 12:57
  */
 
-namespace Kilingzhang\QQ\Core;
+namespace Kilingzhang\QQ\CoolQ;
 
 
-class CoolQ implements QQ
+use Kilingzhang\QQ\Core\Blacklist;
+use Kilingzhang\QQ\Core\Protocols\Protocol;
+use Kilingzhang\QQ\Core\QQ as BaseQQ;
+use Kilingzhang\QQ\Core\Response;
+use Kilingzhang\QQ\Core\Whitelist;
+
+class QQ implements BaseQQ
 {
     use Blacklist, Whitelist;
+
+    /**
+     * @var Protocol
+     */
+    private $request;
+
+
+    public function __construct(Protocol $request)
+    {
+        $this->request = $request;
+    }
+
 
     /**
      * 发送私聊消息 同步
@@ -21,9 +39,14 @@ class CoolQ implements QQ
      * @param bool $autoEscape 是否转译CQ码等特殊符号
      * @return mixed
      */
-    public function sendPrivateMsg(int $userId, string $message, bool $autoEscape = false): array
+    public function sendPrivateMsg(int $userId, string $message, bool $autoEscape = false): Response
     {
-        // TODO: Implement sendPrivateMsg() method.
+        $response = $this->request->send(Url::send_private_msg, [
+            'user_id' => $userId,
+            'message' => $message,
+            'auto_escape' => $autoEscape,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -33,7 +56,7 @@ class CoolQ implements QQ
      * @param bool $autoEscape 是否转译CQ码等特殊符号
      * @return mixed
      */
-    public function sendPrivateMsgAsync(int $userId, string $message, bool $autoEscape = false): array
+    public function sendPrivateMsgAsync(int $userId, string $message, bool $autoEscape = false): Response
     {
         // TODO: Implement sendPrivateMsgAsync() method.
     }
@@ -45,7 +68,7 @@ class CoolQ implements QQ
      * @param bool $autoEscape 是否转译CQ码等特殊符号
      * @return mixed
      */
-    public function sendGroupMsg(int $groupId, string $message, bool $autoEscape = false): array
+    public function sendGroupMsg(int $groupId, string $message, bool $autoEscape = false): Response
     {
         // TODO: Implement sendGroupMsg() method.
     }
@@ -57,7 +80,7 @@ class CoolQ implements QQ
      * @param bool $autoEscape 是否转译CQ码等特殊符号
      * @return mixed
      */
-    public function sendGroupMsgAsync(int $groupId, string $message, bool $autoEscape = false): array
+    public function sendGroupMsgAsync(int $groupId, string $message, bool $autoEscape = false): Response
     {
         // TODO: Implement sendGroupMsgAsync() method.
     }
@@ -69,7 +92,7 @@ class CoolQ implements QQ
      * @param bool $autoEscape 是否转译CQ码等特殊符号
      * @return mixed
      */
-    public function sendDiscussMsg(int $discussId, string $message, bool $autoEscape = false): array
+    public function sendDiscussMsg(int $discussId, string $message, bool $autoEscape = false): Response
     {
         // TODO: Implement sendDiscussMsg() method.
     }
@@ -81,7 +104,7 @@ class CoolQ implements QQ
      * @param bool $autoEscape 是否转译CQ码等特殊符号
      * @return mixed
      */
-    public function sendDiscussMsgAsync(int $discussId, string $message, bool $autoEscape = false): array
+    public function sendDiscussMsgAsync(int $discussId, string $message, bool $autoEscape = false): Response
     {
         // TODO: Implement sendDiscussMsgAsync() method.
     }
@@ -94,7 +117,7 @@ class CoolQ implements QQ
      * @param bool $autoEscape 是否转译CQ码等特殊符号
      * @return mixed
      */
-    public function sendMsg(string $messageType, int $id, string $message, bool $autoEscape = false): array
+    public function sendMsg(string $messageType, int $id, string $message, bool $autoEscape = false): Response
     {
         // TODO: Implement sendMsg() method.
     }
@@ -107,7 +130,7 @@ class CoolQ implements QQ
      * @param bool $autoEscape 是否转译CQ码等特殊符号
      * @return mixed
      */
-    public function sendMsgAsync(string $messageType, int $id, string $message, bool $autoEscape = false): array
+    public function sendMsgAsync(string $messageType, int $id, string $message, bool $autoEscape = false): Response
     {
         // TODO: Implement sendMsgAsync() method.
     }
@@ -117,7 +140,7 @@ class CoolQ implements QQ
      * @param int $messageId 消息id
      * @return mixed
      */
-    public function deleteMsg(int $messageId): array
+    public function deleteMsg(int $messageId): Response
     {
         // TODO: Implement deleteMsg() method.
     }
@@ -128,7 +151,7 @@ class CoolQ implements QQ
      * @param int $messageId 消息id
      * @return mixed
      */
-    public function deleteGroupMsg(int $groupId, int $messageId): array
+    public function deleteGroupMsg(int $groupId, int $messageId): Response
     {
         // TODO: Implement deleteGroupMsg() method.
     }
@@ -139,7 +162,7 @@ class CoolQ implements QQ
      * @param int $times
      * @return mixed
      */
-    public function sendLike(int $userId, int $times = 1): array
+    public function sendLike(int $userId, int $times = 1): Response
     {
         // TODO: Implement sendLike() method.
     }
@@ -149,7 +172,7 @@ class CoolQ implements QQ
      * @param int $userId
      * @return mixed
      */
-    public function sendShake(int $userId): array
+    public function sendShake(int $userId): Response
     {
         // TODO: Implement sendShake() method.
     }
@@ -159,7 +182,7 @@ class CoolQ implements QQ
      * @param string $ignature
      * @return mixed
      */
-    public function setQQSignature(string $ignature): array
+    public function setQQSignature(string $ignature): Response
     {
         // TODO: Implement setQQSignature() method.
     }
@@ -170,7 +193,7 @@ class CoolQ implements QQ
      * @param string $friendName 备注名
      * @return mixed
      */
-    public function setFriendName(int $userId, string $friendName): array
+    public function setFriendName(int $userId, string $friendName): Response
     {
         // TODO: Implement setFriendName() method.
     }
@@ -180,7 +203,7 @@ class CoolQ implements QQ
      * @param int $userId QQ
      * @return mixed
      */
-    public function deleteFriend(int $userId): array
+    public function deleteFriend(int $userId): Response
     {
         // TODO: Implement deleteFriend() method.
     }
@@ -191,7 +214,7 @@ class CoolQ implements QQ
      * @param string $msg 附带信息
      * @return mixed
      */
-    public function addFriend(int $userId, string $msg): array
+    public function addFriend(int $userId, string $msg): Response
     {
         // TODO: Implement addFriend() method.
     }
@@ -202,7 +225,7 @@ class CoolQ implements QQ
      * @param string $msg 附带信息
      * @return mixed
      */
-    public function addGroup(int $groupId, string $msg): array
+    public function addGroup(int $groupId, string $msg): Response
     {
         // TODO: Implement addGroup() method.
     }
@@ -214,7 +237,7 @@ class CoolQ implements QQ
      * @param bool $rejectAddRequest 是否不再接收加群申请
      * @return mixed
      */
-    public function setGroupKick(int $groupId, int $userId, bool $rejectAddRequest = false): array
+    public function setGroupKick(int $groupId, int $userId, bool $rejectAddRequest = false): Response
     {
         // TODO: Implement setGroupKick() method.
     }
@@ -226,7 +249,7 @@ class CoolQ implements QQ
      * @param int $duration 禁言时长 单位:秒 0为解除禁言 默认30分钟
      * @return mixed
      */
-    public function setGroupBan(int $groupId, int $userId, int $duration = 30 * 60): array
+    public function setGroupBan(int $groupId, int $userId, int $duration = 30 * 60): Response
     {
         // TODO: Implement setGroupBan() method.
     }
@@ -238,7 +261,7 @@ class CoolQ implements QQ
      * @param int $duration 禁言时长 单位:秒 0为解除禁言 默认30分钟
      * @return mixed
      */
-    public function setGroupAnonymousBan(int $groupId, string $flag, int $duration = 30 * 60): array
+    public function setGroupAnonymousBan(int $groupId, string $flag, int $duration = 30 * 60): Response
     {
         // TODO: Implement setGroupAnonymousBan() method.
     }
@@ -249,7 +272,7 @@ class CoolQ implements QQ
      * @param bool $enable 禁言、解除
      * @return mixed
      */
-    public function setGroupWholeBan(int $groupId, bool $enable = true): array
+    public function setGroupWholeBan(int $groupId, bool $enable = true): Response
     {
         // TODO: Implement setGroupWholeBan() method.
     }
@@ -261,7 +284,7 @@ class CoolQ implements QQ
      * @param bool $enable 设置、取消
      * @return mixed
      */
-    public function setGroupAdmin(int $groupId, int $userId, bool $enable = true): array
+    public function setGroupAdmin(int $groupId, int $userId, bool $enable = true): Response
     {
         // TODO: Implement setGroupAdmin() method.
     }
@@ -272,7 +295,7 @@ class CoolQ implements QQ
      * @param bool $enable 开启、关闭
      * @return mixed
      */
-    public function setGroupAnonymous(int $groupId, bool $enable = true): array
+    public function setGroupAnonymous(int $groupId, bool $enable = true): Response
     {
         // TODO: Implement setGroupAnonymous() method.
     }
@@ -284,7 +307,7 @@ class CoolQ implements QQ
      * @param string|null $card 新名片
      * @return mixed
      */
-    public function setGroupCard(int $groupId, int $userId, string $card = null): array
+    public function setGroupCard(int $groupId, int $userId, string $card = null): Response
     {
         // TODO: Implement setGroupCard() method.
     }
@@ -295,7 +318,7 @@ class CoolQ implements QQ
      * @param bool $is_dismiss 是否解散，如果登录号是群主，则仅在此项为 true 时能够解散
      * @return mixed
      */
-    public function setGroupLeave(int $groupId, bool $is_dismiss = false): array
+    public function setGroupLeave(int $groupId, bool $is_dismiss = false): Response
     {
         // TODO: Implement setGroupLeave() method.
     }
@@ -305,7 +328,7 @@ class CoolQ implements QQ
      * @param int $groupId 群号
      * @return mixed
      */
-    public function setRemoveGroup(int $groupId): array
+    public function setRemoveGroup(int $groupId): Response
     {
         // TODO: Implement setRemoveGroup() method.
     }
@@ -318,7 +341,7 @@ class CoolQ implements QQ
      * @param int $duration 专属头衔有效期，单位秒，-1 表示永久，不过此项似乎没有效果，可能是只有某些特殊的时间长度有效，有待测试
      * @return mixed
      */
-    public function setGroupSpecialTitle(int $groupId, int $userId, string $specialTitle = null, int $duration = -1): array
+    public function setGroupSpecialTitle(int $groupId, int $userId, string $specialTitle = null, int $duration = -1): Response
     {
         // TODO: Implement setGroupSpecialTitle() method.
     }
@@ -329,7 +352,7 @@ class CoolQ implements QQ
      * @param string $discussName
      * @return mixed
      */
-    public function setDiscussName(int $discussId, string $discussName): array
+    public function setDiscussName(int $discussId, string $discussName): Response
     {
         // TODO: Implement setDiscussName() method.
     }
@@ -339,7 +362,7 @@ class CoolQ implements QQ
      * @param int $discussId
      * @return mixed
      */
-    public function setDiscussLeave(int $discussId): array
+    public function setDiscussLeave(int $discussId): Response
     {
         // TODO: Implement setDiscussLeave() method.
     }
@@ -351,7 +374,7 @@ class CoolQ implements QQ
      * @param string $remark 添加后的好友备注（仅在同意时有效）
      * @return mixed
      */
-    public function setFriendAddRequest(string $flag, bool $approve = true, string $remark = ''): array
+    public function setFriendAddRequest(string $flag, bool $approve = true, string $remark = ''): Response
     {
         // TODO: Implement setFriendAddRequest() method.
     }
@@ -364,7 +387,7 @@ class CoolQ implements QQ
      * @param string $reason 拒绝理由（仅在拒绝时有效）
      * @return mixed
      */
-    public function setGroupAddRequest(string $flag, string $type, bool $approve = true, string $reason = ''): array
+    public function setGroupAddRequest(string $flag, string $type, bool $approve = true, string $reason = ''): Response
     {
         // TODO: Implement setGroupAddRequest() method.
     }
@@ -373,7 +396,7 @@ class CoolQ implements QQ
      * 获取登录号信息
      * @return mixed
      */
-    public function getQQLoginInfo(): array
+    public function getQQLoginInfo(): Response
     {
         // TODO: Implement getQQLoginInfo() method.
     }
@@ -384,7 +407,7 @@ class CoolQ implements QQ
      * @param bool $noCache
      * @return mixed
      */
-    public function getStrangerInfo(int $userId, bool $noCache = false): array
+    public function getStrangerInfo(int $userId, bool $noCache = false): Response
     {
         // TODO: Implement getStrangerInfo() method.
     }
@@ -395,7 +418,7 @@ class CoolQ implements QQ
      * @param bool $noCache
      * @return mixed
      */
-    public function getQQInfo(int $userId, bool $noCache = false): array
+    public function getQQInfo(int $userId, bool $noCache = false): Response
     {
         // TODO: Implement getQQInfo() method.
     }
@@ -404,7 +427,7 @@ class CoolQ implements QQ
      * 获取群列表
      * @return mixed
      */
-    public function getGroupList(): array
+    public function getGroupList(): Response
     {
         // TODO: Implement getGroupList() method.
     }
@@ -416,7 +439,7 @@ class CoolQ implements QQ
      * @param bool $noCache
      * @return mixed
      */
-    public function getGroupMemberInfo(int $groupId, int $userId, bool $noCache = false): array
+    public function getGroupMemberInfo(int $groupId, int $userId, bool $noCache = false): Response
     {
         // TODO: Implement getGroupMemberInfo() method.
     }
@@ -426,7 +449,7 @@ class CoolQ implements QQ
      * @param int $groupId
      * @return mixed
      */
-    public function getGroupMemberList(int $groupId): array
+    public function getGroupMemberList(int $groupId): Response
     {
         // TODO: Implement getGroupMemberList() method.
     }
@@ -437,7 +460,7 @@ class CoolQ implements QQ
      * @param $int $userId
      * @return mixed
      */
-    public function inviteFriendIntoGroup(int $groupId, int $userId): array
+    public function inviteFriendIntoGroup(int $groupId, int $userId): Response
     {
         // TODO: Implement inviteFriendIntoGroup() method.
     }
@@ -446,7 +469,7 @@ class CoolQ implements QQ
      * 取Cookies
      * @return mixed
      */
-    public function getCookies(): array
+    public function getCookies(): Response
     {
         // TODO: Implement getCookies() method.
     }
@@ -455,7 +478,7 @@ class CoolQ implements QQ
      * 取bkn
      * @return mixed
      */
-    public function getBkn(): array
+    public function getBkn(): Response
     {
         // TODO: Implement getBkn() method.
     }
@@ -464,7 +487,7 @@ class CoolQ implements QQ
      * 取ClientKey
      * @return mixed
      */
-    public function getClientKey(): array
+    public function getClientKey(): Response
     {
         // TODO: Implement getClientKey() method.
     }
@@ -473,7 +496,7 @@ class CoolQ implements QQ
      * 获取 QQ 相关接口凭证 (为了兼容不同平台返回的不同值)
      * @return mixed
      */
-    public function getCredentials(): array
+    public function getCredentials(): Response
     {
         // TODO: Implement getCredentials() method.
     }
