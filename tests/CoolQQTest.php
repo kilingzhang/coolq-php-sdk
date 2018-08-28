@@ -75,14 +75,14 @@ class CoolQQTest extends TestCase
     public function testSendDiscussMsg()
     {
         $text = $this->faker->text;
-        $response = $this->QQ->sendGroupMsgAsync($this->devDiscussId, $text, false);
+        $response = $this->QQ->sendDiscussMsg($this->devDiscussId, $text, false);
         $this->assertInstanceOf(Response::class, $response);
     }
 
     public function testSendDiscussMsgAsync()
     {
         $text = $this->faker->text;
-        $response = $this->QQ->sendGroupMsgAsync($this->devDiscussId, $text, false);
+        $response = $this->QQ->sendDiscussMsgAsync($this->devDiscussId, $text, false);
         $this->assertInstanceOf(Response::class, $response);
     }
 

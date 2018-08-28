@@ -109,7 +109,7 @@ class QQ implements BaseQQ
      */
     public function sendDiscussMsg(int $discussId, string $message, bool $autoEscape = false): Response
     {
-        $response = $this->request->send(Url::sendDiscuss_msg, [
+        $response = $this->request->send(Url::send_discuss_msg, [
             'discuss_id' => $discussId,
             'message' => $message,
             'auto_escape' => $autoEscape,
@@ -126,7 +126,7 @@ class QQ implements BaseQQ
      */
     public function sendDiscussMsgAsync(int $discussId, string $message, bool $autoEscape = false): Response
     {
-        $response = $this->request->send(Url::sendDiscuss_msg_async, [
+        $response = $this->request->send(Url::send_discuss_msg_async, [
             'discuss_id' => $discussId,
             'message' => $message,
             'auto_escape' => $autoEscape,
