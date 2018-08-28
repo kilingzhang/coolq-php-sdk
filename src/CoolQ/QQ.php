@@ -424,7 +424,7 @@ class QQ implements BaseQQ
      */
     public function setGroupSpecialTitle(int $groupId, int $userId, string $specialTitle = null, int $duration = -1): Response
     {
-        $response = $this->request->send(Url::set_group_leave, [
+        $response = $this->request->send(Url::set_group_special_title, [
             'group_id' => $groupId,
             'user_id' => $userId,
             'special_title' => $specialTitle,

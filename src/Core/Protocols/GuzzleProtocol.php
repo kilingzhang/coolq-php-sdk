@@ -74,6 +74,7 @@ class GuzzleProtocol implements Protocol
                 if ($code != 0) {
                     return Response::response(200, $code, []);
                 }
+                $data = empty($data) ? [] : $data;
                 return Response::ok($data);
             }
         } catch (ClientException $e) {

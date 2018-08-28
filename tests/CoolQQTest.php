@@ -34,6 +34,8 @@ class CoolQQTest extends TestCase
     private $secret = '';
     private $messageId;
     private $flagId;
+    private $messageGroupId;
+    private $messageDiscussId;
 
     public function setUp()
     {
@@ -100,13 +102,21 @@ class CoolQQTest extends TestCase
 
     public function testDeleteMsg()
     {
+        $text = $this->faker->text;
+        $response = $this->QQ->sendPrivateMsg($this->devQQ, $text, false);
+        $data = $response->getData();
+        $this->messageId = $data['message_id'];
         $response = $this->QQ->deleteMsg($this->messageId);
         $this->assertInstanceOf(Response::class, $response);
     }
 
     public function testDeleteGroupMsg()
     {
-        $response = $this->QQ->deleteGroupMsg($this->devGroupId, $this->messageId);
+        $text = $this->faker->text;
+        $response = $this->QQ->sendGroupMsg($this->devGroupId, $text, false);
+        $data = $response->getData();
+        $this->messageGroupId = $data['message_id'];
+        $response = $this->QQ->deleteGroupMsg($this->devGroupId, $this->messageGroupId);
         $this->assertInstanceOf(Response::class, $response);
     }
 
@@ -136,11 +146,11 @@ class CoolQQTest extends TestCase
         $this->assertInstanceOf(Response::class, $response);
     }
 
-    public function testDeleteFriend()
-    {
-        $response = $this->QQ->deleteFriend($this->devQQ);
-        $this->assertInstanceOf(Response::class, $response);
-    }
+//    public function testDeleteFriend()
+//    {
+//        $response = $this->QQ->deleteFriend($this->devQQ);
+//        $this->assertInstanceOf(Response::class, $response);
+//    }
 
     public function testAddFriend()
     {
@@ -156,28 +166,34 @@ class CoolQQTest extends TestCase
         $this->assertInstanceOf(Response::class, $response);
     }
 
-    public function testSetGroupKick()
-    {
-        $name = $this->faker->name;
-        $response = $this->QQ->setGroupKick($this->devGroupId, $this->devQQ, $name);
-        $this->assertInstanceOf(Response::class, $response);
-    }
+//    public function testSetGroupKick()
+//    {
+//        $name = $this->faker->name;
+//        $response = $this->QQ->setGroupKick($this->devGroupId, $this->devQQ, $name);
+//        $this->assertInstanceOf(Response::class, $response);
+//    }
 
     public function testSetGroupBan()
     {
-        $response = $this->QQ->setGroupBan($this->devGroupId, $this->devQQ);
+        $response = $this->QQ->setGroupBan($this->devGroupId, $this->devQQ, 1);
         $this->assertInstanceOf(Response::class, $response);
     }
 
-    public function testSetGroupAnonymousBan()
-    {
-        $response = $this->QQ->setGroupAnonymousBan($this->devGroupId, $this->flagId);
-        $this->assertInstanceOf(Response::class, $response);
-    }
+//    public function testSetGroupAnonymousBan()
+//    {
+//        $response = $this->QQ->setGroupAnonymousBan($this->devGroupId, $this->flagId);
+//        $this->assertInstanceOf(Response::class, $response);
+//    }
 
     public function testSetGroupWholeBan()
     {
         $response = $this->QQ->setGroupWholeBan($this->devGroupId);
+        $this->assertInstanceOf(Response::class, $response);
+    }
+
+    public function testSetGroupWholeOpen()
+    {
+        $response = $this->QQ->setGroupWholeBan($this->devGroupId, false);
         $this->assertInstanceOf(Response::class, $response);
     }
 
@@ -200,17 +216,17 @@ class CoolQQTest extends TestCase
         $this->assertInstanceOf(Response::class, $response);
     }
 
-    public function testSetGroupLeave()
-    {
-        $response = $this->QQ->setGroupLeave($this->devGroupId, false);
-        $this->assertInstanceOf(Response::class, $response);
-    }
+//    public function testSetGroupLeave()
+//    {
+//        $response = $this->QQ->setGroupLeave($this->devGroupId, false);
+//        $this->assertInstanceOf(Response::class, $response);
+//    }
 
-    public function testSetRemoveGroup()
-    {
-        $response = $this->QQ->setRemoveGroup($this->devGroupId);
-        $this->assertInstanceOf(Response::class, $response);
-    }
+//    public function testSetRemoveGroup()
+//    {
+//        $response = $this->QQ->setRemoveGroup($this->devGroupId);
+//        $this->assertInstanceOf(Response::class, $response);
+//    }
 
     public function testSetGroupSpecialTitle()
     {
@@ -222,29 +238,29 @@ class CoolQQTest extends TestCase
     public function testSetDiscussName()
     {
         $name = $this->faker->name;
-        $response = $this->QQ->setGroupSpecialTitle($this->devDiscussId, $name);
+        $response = $this->QQ->setDiscussName($this->devDiscussId, $name);
         $this->assertInstanceOf(Response::class, $response);
     }
 
-    public function testSetDiscussLeave()
-    {
-        $response = $this->QQ->setDiscussLeave($this->devDiscussId);
-        $this->assertInstanceOf(Response::class, $response);
-    }
+//    public function testSetDiscussLeave()
+//    {
+//        $response = $this->QQ->setDiscussLeave($this->devDiscussId);
+//        $this->assertInstanceOf(Response::class, $response);
+//    }
 
-    public function testSetFriendAddRequest()
-    {
-        $remark = $this->faker->title;
-        $response = $this->QQ->setFriendAddRequest($this->flagId, true, $remark);
-        $this->assertInstanceOf(Response::class, $response);
-    }
-
-    public function testSetGroupAddRequest()
-    {
-        $reason = $this->faker->title;
-        $response = $this->QQ->setGroupAddRequest($this->flagId, true, $reason);
-        $this->assertInstanceOf(Response::class, $response);
-    }
+//    public function testSetFriendAddRequest()
+//    {
+//        $remark = $this->faker->title;
+//        $response = $this->QQ->setFriendAddRequest($this->flagId, true, $remark);
+//        $this->assertInstanceOf(Response::class, $response);
+//    }
+//
+//    public function testSetGroupAddRequest()
+//    {
+//        $reason = $this->faker->title;
+//        $response = $this->QQ->setGroupAddRequest($this->flagId, true, $reason);
+//        $this->assertInstanceOf(Response::class, $response);
+//    }
 
     public function testGetQQLoginInfo()
     {
