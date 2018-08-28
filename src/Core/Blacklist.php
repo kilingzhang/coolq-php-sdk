@@ -15,7 +15,7 @@ Trait  Blacklist
     /**
      * @var bool
      */
-    private $isWhiteList = false;
+    private $isBlackList = true;
 
     /**
      * 私聊黑名单
@@ -98,4 +98,5 @@ Trait  Blacklist
     {
         $this->discussBlackList = $discussBlackList;
     }
+
 }

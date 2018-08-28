@@ -15,7 +15,7 @@ trait Whitelist
     /**
      * @var bool
      */
-    private $isWhiteList = false;
+    private $isWhiteList = true;
 
     /**
      * 白名单优先级高于黑名单 当开启白名单时，黑名单将失效

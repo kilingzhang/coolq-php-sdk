@@ -46,6 +46,12 @@ class Url
     const set_restart = '/set_restart';
     const set_restart_plugin = '/set_restart_plugin';
     const clean_data_dir = '/clean_data_dir';
+    const get_file_resource = '/data/';
+    const get_credentials = '/get_credentials';
+
+
     const _get_friend_list = '/_get_friend_list';
-    const getFileResource = '/data/';
+    const _get_group_info = '/_get_group_info';
+    const _get_vip_info = '/_get_vip_info';
+
 }

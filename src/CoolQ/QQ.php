@@ -11,6 +11,7 @@ namespace Kilingzhang\QQ\CoolQ;
 
 
 use Kilingzhang\QQ\Core\Blacklist;
+use Kilingzhang\QQ\Core\isCanSend;
 use Kilingzhang\QQ\Core\Protocols\Protocol;
 use Kilingzhang\QQ\Core\QQ as BaseQQ;
 use Kilingzhang\QQ\Core\Response;
@@ -18,8 +19,7 @@ use Kilingzhang\QQ\Core\Whitelist;
 
 class QQ implements BaseQQ
 {
-    use Blacklist, Whitelist;
-
+    use isCanSend;
     /**
      * @var Protocol
      */
@@ -58,7 +58,12 @@ class QQ implements BaseQQ
      */
     public function sendPrivateMsgAsync(int $userId, string $message, bool $autoEscape = false): Response
     {
-        // TODO: Implement sendPrivateMsgAsync() method.
+        $response = $this->request->send(Url::send_private_msg_async, [
+            'user_id' => $userId,
+            'message' => $message,
+            'auto_escape' => $autoEscape,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -70,7 +75,12 @@ class QQ implements BaseQQ
      */
     public function sendGroupMsg(int $groupId, string $message, bool $autoEscape = false): Response
     {
-        // TODO: Implement sendGroupMsg() method.
+        $response = $this->request->send(Url::send_group_msg, [
+            'group_id' => $groupId,
+            'message' => $message,
+            'auto_escape' => $autoEscape,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -82,7 +92,12 @@ class QQ implements BaseQQ
      */
     public function sendGroupMsgAsync(int $groupId, string $message, bool $autoEscape = false): Response
     {
-        // TODO: Implement sendGroupMsgAsync() method.
+        $response = $this->request->send(Url::send_group_msg_async, [
+            'group_id' => $groupId,
+            'message' => $message,
+            'auto_escape' => $autoEscape,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -94,7 +109,12 @@ class QQ implements BaseQQ
      */
     public function sendDiscussMsg(int $discussId, string $message, bool $autoEscape = false): Response
     {
-        // TODO: Implement sendDiscussMsg() method.
+        $response = $this->request->send(Url::sendDiscuss_msg, [
+            'discuss_id' => $discussId,
+            'message' => $message,
+            'auto_escape' => $autoEscape,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -106,7 +126,12 @@ class QQ implements BaseQQ
      */
     public function sendDiscussMsgAsync(int $discussId, string $message, bool $autoEscape = false): Response
     {
-        // TODO: Implement sendDiscussMsgAsync() method.
+        $response = $this->request->send(Url::sendDiscuss_msg_async, [
+            'discuss_id' => $discussId,
+            'message' => $message,
+            'auto_escape' => $autoEscape,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -119,7 +144,13 @@ class QQ implements BaseQQ
      */
     public function sendMsg(string $messageType, int $id, string $message, bool $autoEscape = false): Response
     {
-        // TODO: Implement sendMsg() method.
+        $response = $this->request->send(Url::send_msg, [
+            'message_type' => $messageType,
+            'id' => $id,
+            'message' => $message,
+            'auto_escape' => $autoEscape,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -132,7 +163,13 @@ class QQ implements BaseQQ
      */
     public function sendMsgAsync(string $messageType, int $id, string $message, bool $autoEscape = false): Response
     {
-        // TODO: Implement sendMsgAsync() method.
+        $response = $this->request->send(Url::send_msg_async, [
+            'message_type' => $messageType,
+            'id' => $id,
+            'message' => $message,
+            'auto_escape' => $autoEscape,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -142,7 +179,10 @@ class QQ implements BaseQQ
      */
     public function deleteMsg(int $messageId): Response
     {
-        // TODO: Implement deleteMsg() method.
+        $response = $this->request->send(Url::delete_msg, [
+            'message_id' => $messageId,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -153,7 +193,7 @@ class QQ implements BaseQQ
      */
     public function deleteGroupMsg(int $groupId, int $messageId): Response
     {
-        // TODO: Implement deleteGroupMsg() method.
+        return $this->deleteMsg($messageId);
     }
 
     /**
@@ -164,7 +204,11 @@ class QQ implements BaseQQ
      */
     public function sendLike(int $userId, int $times = 1): Response
     {
-        // TODO: Implement sendLike() method.
+        $response = $this->request->send(Url::send_like, [
+            'user_id' => $userId,
+            'times' => $times,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -174,7 +218,7 @@ class QQ implements BaseQQ
      */
     public function sendShake(int $userId): Response
     {
-        // TODO: Implement sendShake() method.
+        return $this->sendPrivateMsg($userId, CQ::shake());
     }
 
     /**
@@ -184,7 +228,7 @@ class QQ implements BaseQQ
      */
     public function setQQSignature(string $ignature): Response
     {
-        // TODO: Implement setQQSignature() method.
+        return Response::notFoundResourceError();
     }
 
     /**
@@ -195,7 +239,7 @@ class QQ implements BaseQQ
      */
     public function setFriendName(int $userId, string $friendName): Response
     {
-        // TODO: Implement setFriendName() method.
+        return Response::notFoundResourceError();
     }
 
     /**
@@ -205,7 +249,7 @@ class QQ implements BaseQQ
      */
     public function deleteFriend(int $userId): Response
     {
-        // TODO: Implement deleteFriend() method.
+        return Response::notFoundResourceError();
     }
 
     /**
@@ -216,7 +260,7 @@ class QQ implements BaseQQ
      */
     public function addFriend(int $userId, string $msg): Response
     {
-        // TODO: Implement addFriend() method.
+        return Response::notFoundResourceError();
     }
 
     /**
@@ -227,7 +271,7 @@ class QQ implements BaseQQ
      */
     public function addGroup(int $groupId, string $msg): Response
     {
-        // TODO: Implement addGroup() method.
+        return Response::notFoundResourceError();
     }
 
     /**
@@ -239,7 +283,12 @@ class QQ implements BaseQQ
      */
     public function setGroupKick(int $groupId, int $userId, bool $rejectAddRequest = false): Response
     {
-        // TODO: Implement setGroupKick() method.
+        $response = $this->request->send(Url::set_group_kick, [
+            'group_id' => $groupId,
+            'user_id' => $userId,
+            'reject_add_request' => $rejectAddRequest,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -251,7 +300,12 @@ class QQ implements BaseQQ
      */
     public function setGroupBan(int $groupId, int $userId, int $duration = 30 * 60): Response
     {
-        // TODO: Implement setGroupBan() method.
+        $response = $this->request->send(Url::set_group_ban, [
+            'group_id' => $groupId,
+            'user_id' => $userId,
+            'duration' => $duration,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -263,7 +317,12 @@ class QQ implements BaseQQ
      */
     public function setGroupAnonymousBan(int $groupId, string $flag, int $duration = 30 * 60): Response
     {
-        // TODO: Implement setGroupAnonymousBan() method.
+        $response = $this->request->send(Url::set_group_anonymous_ban, [
+            'group_id' => $groupId,
+            'flag' => $flag,
+            'duration' => $duration,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -274,7 +333,11 @@ class QQ implements BaseQQ
      */
     public function setGroupWholeBan(int $groupId, bool $enable = true): Response
     {
-        // TODO: Implement setGroupWholeBan() method.
+        $response = $this->request->send(Url::set_group_whole_ban, [
+            'group_id' => $groupId,
+            'enable' => $enable,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -286,7 +349,12 @@ class QQ implements BaseQQ
      */
     public function setGroupAdmin(int $groupId, int $userId, bool $enable = true): Response
     {
-        // TODO: Implement setGroupAdmin() method.
+        $response = $this->request->send(Url::set_group_admin, [
+            'group_id' => $groupId,
+            'user_id' => $userId,
+            'enable' => $enable,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -297,7 +365,11 @@ class QQ implements BaseQQ
      */
     public function setGroupAnonymous(int $groupId, bool $enable = true): Response
     {
-        // TODO: Implement setGroupAnonymous() method.
+        $response = $this->request->send(Url::set_group_anonymous, [
+            'group_id' => $groupId,
+            'enable' => $enable,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -309,18 +381,27 @@ class QQ implements BaseQQ
      */
     public function setGroupCard(int $groupId, int $userId, string $card = null): Response
     {
-        // TODO: Implement setGroupCard() method.
+        $response = $this->request->send(Url::set_group_card, [
+            'group_id' => $groupId,
+            'user_id' => $userId,
+            'card' => $card,
+        ], 'POST');
+        return $response;
     }
 
     /**
      * 退群
      * @param int $groupId 群号
-     * @param bool $is_dismiss 是否解散，如果登录号是群主，则仅在此项为 true 时能够解散
+     * @param bool $isDismiss 是否解散，如果登录号是群主，则仅在此项为 true 时能够解散
      * @return mixed
      */
-    public function setGroupLeave(int $groupId, bool $is_dismiss = false): Response
+    public function setGroupLeave(int $groupId, bool $isDismiss = false): Response
     {
-        // TODO: Implement setGroupLeave() method.
+        $response = $this->request->send(Url::set_group_leave, [
+            'group_id' => $groupId,
+            'is_dismiss' => $isDismiss,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -330,7 +411,7 @@ class QQ implements BaseQQ
      */
     public function setRemoveGroup(int $groupId): Response
     {
-        // TODO: Implement setRemoveGroup() method.
+        return $this->setGroupLeave($groupId, true);
     }
 
     /**
@@ -343,7 +424,13 @@ class QQ implements BaseQQ
      */
     public function setGroupSpecialTitle(int $groupId, int $userId, string $specialTitle = null, int $duration = -1): Response
     {
-        // TODO: Implement setGroupSpecialTitle() method.
+        $response = $this->request->send(Url::set_group_leave, [
+            'group_id' => $groupId,
+            'user_id' => $userId,
+            'special_title' => $specialTitle,
+            'duration' => $duration,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -354,7 +441,7 @@ class QQ implements BaseQQ
      */
     public function setDiscussName(int $discussId, string $discussName): Response
     {
-        // TODO: Implement setDiscussName() method.
+        return Response::notFoundResourceError();
     }
 
     /**
@@ -364,7 +451,10 @@ class QQ implements BaseQQ
      */
     public function setDiscussLeave(int $discussId): Response
     {
-        // TODO: Implement setDiscussLeave() method.
+        $response = $this->request->send(Url::set_discuss_leave, [
+            'discuss_id' => $discussId,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -376,7 +466,12 @@ class QQ implements BaseQQ
      */
     public function setFriendAddRequest(string $flag, bool $approve = true, string $remark = ''): Response
     {
-        // TODO: Implement setFriendAddRequest() method.
+        $response = $this->request->send(Url::set_friend_add_request, [
+            'flag' => $flag,
+            'approve' => $approve,
+            'remark' => $remark,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -389,7 +484,13 @@ class QQ implements BaseQQ
      */
     public function setGroupAddRequest(string $flag, string $type, bool $approve = true, string $reason = ''): Response
     {
-        // TODO: Implement setGroupAddRequest() method.
+        $response = $this->request->send(Url::set_group_add_request, [
+            'flag' => $flag,
+            'type' => $type,
+            'approve' => $approve,
+            'reason' => $reason,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -398,7 +499,8 @@ class QQ implements BaseQQ
      */
     public function getQQLoginInfo(): Response
     {
-        // TODO: Implement getQQLoginInfo() method.
+        $response = $this->request->send(Url::get_login_info, [], 'POST');
+        return $response;
     }
 
     /**
@@ -409,7 +511,11 @@ class QQ implements BaseQQ
      */
     public function getStrangerInfo(int $userId, bool $noCache = false): Response
     {
-        // TODO: Implement getStrangerInfo() method.
+        $response = $this->request->send(Url::get_stranger_info, [
+            'user_id' => $userId,
+            'no_cache' => $noCache,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -420,7 +526,7 @@ class QQ implements BaseQQ
      */
     public function getQQInfo(int $userId, bool $noCache = false): Response
     {
-        // TODO: Implement getQQInfo() method.
+        return Response::notFoundResourceError();
     }
 
     /**
@@ -429,7 +535,8 @@ class QQ implements BaseQQ
      */
     public function getGroupList(): Response
     {
-        // TODO: Implement getGroupList() method.
+        $response = $this->request->send(Url::get_group_list, [], 'POST');
+        return $response;
     }
 
     /**
@@ -441,7 +548,12 @@ class QQ implements BaseQQ
      */
     public function getGroupMemberInfo(int $groupId, int $userId, bool $noCache = false): Response
     {
-        // TODO: Implement getGroupMemberInfo() method.
+        $response = $this->request->send(Url::get_group_member_info, [
+            'group_id' => $groupId,
+            'user_id' => $userId,
+            'no_cache' => $noCache,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -451,7 +563,10 @@ class QQ implements BaseQQ
      */
     public function getGroupMemberList(int $groupId): Response
     {
-        // TODO: Implement getGroupMemberList() method.
+        $response = $this->request->send(Url::get_group_member_list, [
+            'group_id' => $groupId,
+        ], 'POST');
+        return $response;
     }
 
     /**
@@ -462,7 +577,7 @@ class QQ implements BaseQQ
      */
     public function inviteFriendIntoGroup(int $groupId, int $userId): Response
     {
-        // TODO: Implement inviteFriendIntoGroup() method.
+        return Response::notFoundResourceError();
     }
 
     /**
@@ -471,7 +586,8 @@ class QQ implements BaseQQ
      */
     public function getCookies(): Response
     {
-        // TODO: Implement getCookies() method.
+        $response = $this->request->send(Url::get_cookies, [], 'POST');
+        return $response;
     }
 
     /**
@@ -480,7 +596,7 @@ class QQ implements BaseQQ
      */
     public function getBkn(): Response
     {
-        // TODO: Implement getBkn() method.
+        return Response::notFoundResourceError();
     }
 
     /**
@@ -489,7 +605,7 @@ class QQ implements BaseQQ
      */
     public function getClientKey(): Response
     {
-        // TODO: Implement getClientKey() method.
+        return Response::notFoundResourceError();
     }
 
     /**
@@ -498,7 +614,8 @@ class QQ implements BaseQQ
      */
     public function getCredentials(): Response
     {
-        // TODO: Implement getCredentials() method.
+        $response = $this->request->send(Url::get_credentials, [], 'POST');
+        return $response;
     }
 }
 

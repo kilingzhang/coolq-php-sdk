@@ -220,10 +220,10 @@ interface QQ
     /**
      * 退群
      * @param int $groupId 群号
-     * @param bool $is_dismiss 是否解散，如果登录号是群主，则仅在此项为 true 时能够解散
+     * @param bool $isDismiss 是否解散，如果登录号是群主，则仅在此项为 true 时能够解散
      * @return mixed
      */
-    public function setGroupLeave(int $groupId, bool $is_dismiss = false): Response;
+    public function setGroupLeave(int $groupId, bool $isDismiss = false): Response;
 
     /**
      * 解散群
