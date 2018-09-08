@@ -21,4 +21,6 @@ interface Protocol
 
     public function isValidated(): bool;
 
+    public function getContent(): array;
+
 }

@@ -15,6 +15,20 @@ interface QQ
     public function __construct(Protocol $request);
 
     /**
+     * @param $messageEvent
+     * @param $noticeEvent
+     * @param $requestEvent
+     * @param $otherEvent
+     * @return mixed
+     */
+    public function event($messageEvent, $noticeEvent, $requestEvent, $otherEvent);
+
+    /**
+     * @return array
+     */
+    public function getContent(): array;
+
+    /**
      * 发送私聊消息 同步
      * @param int $userId QQ
      * @param string $message 消息

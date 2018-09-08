@@ -10,12 +10,10 @@
 namespace Kilingzhang\QQ\CoolQ;
 
 
-use Kilingzhang\QQ\Core\Blacklist;
 use Kilingzhang\QQ\Core\isCanSend;
 use Kilingzhang\QQ\Core\Protocols\Protocol;
 use Kilingzhang\QQ\Core\QQ as BaseQQ;
 use Kilingzhang\QQ\Core\Response;
-use Kilingzhang\QQ\Core\Whitelist;
 
 class QQ implements BaseQQ
 {
@@ -31,6 +29,35 @@ class QQ implements BaseQQ
         $this->request = $request;
     }
 
+    public function event($messageEvent, $noticeEvent, $requestEvent, $otherEvent)
+    {
+        $content = $this->getContent();
+        switch ($content['post_type']) {
+            //收到消息
+            case 'message':
+                $messageEvent($content);
+                break;
+            //群、讨论组变动等非消息类事件
+            case 'notice': //兼容4.0
+            case 'event':
+                $noticeEvent($content);
+                break;
+            //加好友请求、加群请求／邀请
+            case 'request':
+                $requestEvent($content);
+                break;
+            default:
+                $otherEvent($content);
+                break;
+        }
+
+    }
+
+
+    public function getContent(): array
+    {
+        return $this->request->getContent();
+    }
 
     /**
      * 发送私聊消息 同步
@@ -617,5 +644,6 @@ class QQ implements BaseQQ
         $response = $this->request->send(Url::get_credentials, [], 'POST');
         return $response;
     }
+
 }
 
