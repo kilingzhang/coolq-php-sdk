@@ -2,117 +2,110 @@
 /**
  * Created by PhpStorm.
  * User: kilingzhang
- * Date: 18-3-20
- * Time: 下午7:29
+ * Date: 2018/8/28
+ * Time: 0:06
  */
 
-namespace CoolQSDK;
+namespace Kilingzhang\QQ\Core;
 
 
 class Response
 {
-    public static function Respose($data = [], $code = 0, $message = 'success', $status = 'ok')
-    {
-        $respose = null;
-        switch (CoolQ::getReturnFormat()) {
-            case "json":
-                $respose = \GuzzleHttp\json_encode([
-                    'retcode' => $code,
-                    'status' => $status,
-                    'message' => $message,
-                    'data' => $data
-                ], JSON_UNESCAPED_UNICODE);
-                break;
-            case "array":
-                $respose = [
-                    'retcode' => $code,
-                    'status' => $status,
-                    'message' => $message,
-                    'data' => $data
-                ];
-                break;
-            default:
-                $respose = 'Not Found Format';
-                break;
-        }
-        return $respose;
 
+    public $code = 0;
+    public $message = 'success';
+    public $errorCode = 0;
+    public $errorMsg = 0;
+    public $data = [];
+
+    public function __construct(int $code, string $message, int $errorCode, string $errorMsg, array $data)
+    {
+        $this->code = $code;
+        $this->message = $message;
+        $this->errorCode = $errorCode;
+        $this->errorMsg = $errorMsg;
+        $this->data = $data;
     }
 
-    public static function ok($response)
+    /**
+     * @return int
+     */
+    public
+    function getCode(): int
     {
-        if (empty($response) || ($data = \GuzzleHttp\json_decode($response, true)) == null) {
-            return self::error();
-        }
-        return self::respose($data['data'], $data['retcode'], self::getMessage($data['retcode']), $data['status']);
+        return $this->code;
     }
 
-    public static function accessTokenError()
+    /**
+     * @return int
+     */
+    public function getErrorCode(): int
     {
-        return self::respose([], 403, self::getMessage(403), 'failed');
-    }
-
-    public static function signatureError()
-    {
-        return self::respose([], 403, self::getMessage(403), 'failed');
-    }
-
-    public static function accessTokenNoneError()
-    {
-        return self::respose([], 401, self::getMessage(401), 'failed');
-    }
-
-    public static function notFoundResourceError()
-    {
-        return self::respose([], 404, self::getMessage(404), 'failed');
-    }
-
-    public static function banAccountError($data = [])
-    {
-        return self::respose($data, 405 , self::getMessage(405), 'failed');
-    }
-
-    public static function contentTypeError()
-    {
-        return self::respose([], 406, self::getMessage(406), 'failed');
-    }
-
-    public static function pluginServerError($data = [])
-    {
-        return self::respose($data, -2333, self::getMessage(-2333), 'failed');
-    }
-
-    public static function eventMissParamsError($data = [])
-    {
-        return self::respose($data, 65535, self::getMessage(65535), 'failed');
+        return $this->errorCode;
     }
 
 
-    public static function NotExitsSwoolError($data = [])
+    /**
+     * @return string
+     */
+    public function getMessage(): string
     {
-        return self::respose($data, -1000, self::getMessage(-1000), 'failed');
+        return $this->message;
     }
 
-    public static function NotBeCliError($data = [])
+
+    /**
+     * @return array
+     */
+    public function getData(): array
     {
-        return self::respose($data, -1001, self::getMessage(-1001), 'failed');
+        return $this->data;
     }
 
-    public static function NotExitsPcntlError($data = [])
+
+    public function getErrorMsg(): string
     {
-        return self::respose($data, -1002, self::getMessage(-1002), 'failed');
+        return $this->errorMsg;
     }
 
-    public static function error($data = [])
+
+    public function toArray(): array
     {
-        return self::respose($data, 500, self::getMessage(500), 'failed');
+        return [
+            'code' => $this->getCode(),
+            'message' => $this->getMessage(),
+            'errorCode' => $this->getErrorCode(),
+            'errorMsg' => $this->getErrorMsg(),
+            'data' => $this->getData(),
+        ];
     }
 
-    public static function getMessage($retcode)
+    public function toJson(): string
     {
+        return json_encode($this->toArray(), JSON_UNESCAPED_UNICODE);
+    }
+
+    public static function response($code, $errorCode, $data)
+    {
+
 
         $message = [
-            -1 => '请求发送失败=>',
+            0 => '接口请求成功',
+            100 => '请参数参数错误',
+            200 => 'HTTP请求成功',
+            400 => '资源请求被拒绝',
+            500 => '服务器故障',
+            65535 => '未获取到上报事件发送的上报数据',
+        ];
+
+        if (!array_key_exists($code, $message)) {
+            $message = '未知状态码';
+        }
+
+        $message = $message[$code];
+
+        $msg = [
+            -1 => '请求发送失败',
             -2 => '未收到服务器回复，可能未发送成功',
             -3 => '消息过长或为空',
             -4 => '消息解析过程异常',
@@ -192,12 +185,81 @@ class Response
             65535 => '未获取到上报事件发送的上报数据',
         ];
 
-        if (!array_key_exists($retcode, $message)) {
-            return '未知状态码';
+        if (!array_key_exists($errorCode, $msg)) {
+            $msg = '未知状态码';
         }
 
-        return $message[$retcode];
+        $msg = $msg[$errorCode];
+
+        $response = new Response($code, $message, $errorCode, $msg, $data);
+        return $response;
     }
 
+    public static function ok(array $data = [])
+    {
+        $response = new Response(0, 'success', 200, 'success', $data);
+        return $response;
+    }
+
+    public static function notFoundResourceError()
+    {
+        return Response::response(400, 404, []);
+    }
+
+    public static function accessTokenError()
+    {
+        return Response::response(400, 403, []);
+    }
+
+    public static function signatureError()
+    {
+        return Response::response(400, 403, []);
+    }
+
+    public static function accessTokenNoneError()
+    {
+        return Response::response(400, 401, []);
+    }
+
+    public static function banAccountError($data = [])
+    {
+        return Response::response(400, 405, $data);
+    }
+
+    public static function contentTypeError()
+    {
+        return Response::response(400, 406, []);
+    }
+
+    public static function pluginServerError($data = [])
+    {
+        return Response::response(500, -2333, $data);
+    }
+
+    public static function eventMissParamsError($data = [])
+    {
+        return Response::response(100, 65535, $data);
+    }
+
+
+    public static function NotExitsSwoolError($data = [])
+    {
+        return Response::response(500, -1000, $data);
+    }
+
+    public static function NotBeCliError($data = [])
+    {
+        return Response::response(500, -1001, $data);
+    }
+
+    public static function NotExitsPcntlError($data = [])
+    {
+        return Response::response(500, -1002, $data);
+    }
+
+    public static function error($data = [])
+    {
+        return Response::response(500, 500, $data);
+    }
 
 }
