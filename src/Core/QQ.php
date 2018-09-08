@@ -14,6 +14,10 @@ interface QQ
 {
     public function __construct(Protocol $request);
 
+    public function getProtocol(): Protocol;
+
+    public function returnApi(Response $response);
+
     /**
      * @param $messageEvent
      * @param $noticeEvent
@@ -21,7 +25,7 @@ interface QQ
      * @param $otherEvent
      * @return mixed
      */
-    public function event($messageEvent, $noticeEvent, $requestEvent, $otherEvent);
+    public function event($messageEvent, $noticeEvent, $requestEvent, $otherEvent): Response;
 
     /**
      * @return array

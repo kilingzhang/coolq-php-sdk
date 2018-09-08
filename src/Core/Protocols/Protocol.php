@@ -21,6 +21,9 @@ interface Protocol
 
     public function isValidated(): bool;
 
+    public function isCli(): bool ;
+
     public function getContent(): array;
 
+    public function returnApi(Response $response);
 }

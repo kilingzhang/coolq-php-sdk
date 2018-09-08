@@ -149,7 +149,7 @@ class GuzzleProtocol implements Protocol
     public function isValidated(): bool
     {
         $signature = http_server('HTTP_X_SIGNATURE');
-        $signature = $signature == '' ?? substr($signature, 5, strlen($signature));
+        $signature = $signature == '' ? '' : substr($signature, 5, strlen($signature));
         $putParams = http_put();
         if ($this->isSignature && !empty($signature) && (hash_hmac('sha1', \GuzzleHttp\json_encode($putParams, JSON_UNESCAPED_UNICODE), $this->secret) != $signature)) {
             //sha1验证失败
@@ -158,13 +158,16 @@ class GuzzleProtocol implements Protocol
         return true;
     }
 
+    /**
+     * @return array
+     * @throws Exception
+     */
     public function getContent(): array
     {
         $content = http_put();
         if (empty($content)) {
-            throw  new Exception('put params not be empty');
+            throw new Exception('put params not be empty');
         }
-
         switch ($content['post_type']) {
             //收到消息
             case 'message':
@@ -305,7 +308,18 @@ class GuzzleProtocol implements Protocol
                 $this->content = $content;
                 break;
         }
-
+        $this->content['post_type'] = $content['post_type'];
         return $this->content;
+    }
+
+    public function returnApi(Response $response)
+    {
+        echo json_encode($response, JSON_UNESCAPED_UNICODE);
+        exit();
+    }
+
+    public function isCli(): bool
+    {
+        return false;
     }
 }
